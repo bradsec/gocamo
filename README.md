@@ -64,7 +64,7 @@ Below output generating 357 different color palette 4K patterns from `colors.jso
 ### Sample Image
 Generated with the following command:  
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415,#726146,#443f2c,#c1ab89,#937e5e"`
+gocamo -c "#46482f,#6d6851,#9b967f,#1e2415,#726146,#443f2c,#c1ab89,#937e5e"
 ```
 
 ![Sample GOCAMO Image](sample.png)
