@@ -53,7 +53,7 @@ Available options:
 -h:  Set the image height (default is 2160).
      Example: gocamo -j colors.json -w 1920 -h 1080
 
--o:  The output directory or folder for generated images (default creates an 'output' in current directory).
+-o:  The output directory or folder for generated images (default is current directory).
      Example: gocamo -j colors.json -o thisfolder
 
 -lg: Set the size of the large squares in the pattern (default is 20).
