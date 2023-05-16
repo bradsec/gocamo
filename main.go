@@ -238,7 +238,7 @@ func main() {
 	smSquareSizePtr := flag.Int("sm", 10, "Set the size of the small squares in the pattern.")
 	jsonFilePtr := flag.String("j", "colors.json", "Batch process a JSON file containing a list of color palettes.")
 	colorsPtr := flag.String("c", "", "Generate a single pattern using a comma-separated list of hex colors.")
-	outputPtr := flag.String("o", "output", "The output directory or folder for generated images.")
+	outputPtr := flag.String("o", ".", "The output directory or folder for generated images.")
 	randomPtr := flag.Bool("r", false, "Generate a single pattern with random colors.")
 
 	// Parse command line arguments
