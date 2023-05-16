@@ -6,14 +6,11 @@ A Go program that generates digital camouflage patterns using only the standard 
 
 ## Installing
 
-1. Install Go (if not already installed) need help visit: https://go.dev/doc/install
-2. Open terminal and clone the Repo 
+To install gocamo, you need to have Go installed on your system (https://go.dev/doc/install). Once you have Go installed, you can either clone repo and run from source or download and install with the following command:
+
 ```terminal
-git clone https://github.com/bradsec/gocamo.git
+go install github.com/bradsec/gocamo@latest
 ```
-3. Change to the newly created `gocamo` directory.
-4. To build the binary run `go build`
-5. Run using binary `./gocamo [OPTIONS]` or `go run main.go [OPTIONS]` to run from source.
 
 ### Command Line Usage
 
