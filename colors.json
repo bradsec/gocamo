@@ -1,0 +1,775 @@
+[
+  {
+    "name": "desert_dunes",
+    "colors": [
+      "#937e5e",
+      "#c1ab89",
+      "#726146",
+      "#443f2c"
+    ]
+  },
+  {
+    "name": "forest_shadow",
+    "colors": [
+      "#393e2d",
+      "#575039",
+      "#6c6b47",
+      "#2b2c1c"
+    ]
+  },
+  {
+    "name": "meadow_mist",
+    "colors": [
+      "#b9be82",
+      "#010100",
+      "#4d6f4c",
+      "#6f5337"
+    ]
+  },
+  {
+    "name": "arctic_frost",
+    "colors": [
+      "#2e70e4",
+      "#98b8ee",
+      "#cabc9a",
+      "#6c7b72"
+    ]
+  },
+  {
+    "name": "urban_ghost",
+    "colors": [
+      "#cfd2d9",
+      "#b2b2b7",
+      "#6e686a",
+      "#9f9ea3"
+    ]
+  },
+  {
+    "name": "savanna_brush",
+    "colors": [
+      "#8e9466",
+      "#d4cca1",
+      "#0a0c0b",
+      "#4d563f"
+    ]
+  },
+  {
+    "name": "woodland_sentinel",
+    "colors": [
+      "#5e8553",
+      "#5c4f42",
+      "#333330",
+      "#c1bc94"
+    ]
+  },
+  {
+    "name": "artic_sentinel",
+    "colors": [
+      "#c1c1c1",
+      "#f7f7f7",
+      "#595959",
+      "#171717"
+    ]
+  },
+  {
+    "name": "forest_cover",
+    "colors": [
+      "#191919",
+      "#264027",
+      "#8e8c77",
+      "#56644a"
+    ]
+  },
+  {
+    "name": "woodland_states",
+    "colors": [
+      "#50654d",
+      "#9c9177",
+      "#655949",
+      "#313831"
+    ]
+  },
+  {
+    "name": "desert_five",
+    "colors": [
+      "#813d30",
+      "#9a6545",
+      "#cfb18c",
+      "#e3cab9",
+      "#2a201e"
+    ]
+  },
+  {
+    "name": "jungle_five",
+    "colors": [
+      "#3c341f",
+      "#474c3e",
+      "#758469",
+      "#c5aa7f",
+      "#5a5542"
+    ]
+  },
+  {
+    "name": "mud_fight",
+    "colors": [
+      "#54423b",
+      "#7a5d3b",
+      "#c6a872",
+      "#857553"
+    ]
+  },
+  {
+    "name": "forest_night",
+    "colors": [
+      "#191919",
+      "#264027",
+      "#8e8c77",
+      "#54644a"
+    ]
+  },
+  {
+    "name": "tan_greener",
+    "colors": [
+      "#ab7c55",
+      "#c7ba85",
+      "#e8d5aa",
+      "#9e9a5d"
+    ]
+  },
+  {
+    "name": "green_tactics",
+    "colors": [
+      "#252c25",
+      "#4a5a3f",
+      "#e1d5a5",
+      "#8e965b"
+    ]
+  },
+  {
+    "name": "dark_storm",
+    "colors": [
+      "#000000",
+      "#1a1a1a",
+      "#282828",
+      "#0c0c0c"
+    ]
+  },
+  {
+    "name": "artic_storm",
+    "colors": [
+      "#d6e1e8",
+      "#7d8186",
+      "#343438",
+      "#0f0e13"
+    ]
+  },
+  {
+    "name": "woodland_shadows",
+    "colors": [
+      "#847b5b",
+      "#35392c",
+      "#525d3a",
+      "#819359"
+    ]
+  },
+  {
+    "name": "desert_three",
+    "colors": [
+      "#938562",
+      "#b09e80",
+      "#7d5b3f"
+    ]
+  },
+  {
+    "name": "universal_three",
+    "colors": [
+      "#53544c",
+      "#baab94",
+      "#737369"
+    ]
+  },
+  {
+    "name": "military_six",
+    "colors": [
+      "#3f3b23",
+      "#a4895c",
+      "#5b533f",
+      "#736246",
+      "#96794e",
+      "#252b1f"
+    ]
+  },
+  {
+    "name": "mountain_mist",
+    "colors": [
+      "#9bb0c1",
+      "#c4cecc",
+      "#62779d",
+      "#414458"
+    ]
+  },
+  {
+    "name": "autumn_earth",
+    "colors": [
+      "#825e4e",
+      "#bea379",
+      "#5a5341",
+      "#211e29"
+    ]
+  },
+  {
+    "name": "jungle_night",
+    "colors": [
+      "#394c29",
+      "#2c3a28",
+      "#768574",
+      "#142c2a"
+    ]
+  },
+  {
+    "name": "sahara_sunset",
+    "colors": [
+      "#977a54",
+      "#5e4c3a",
+      "#d8c298",
+      "#3e2d22"
+    ]
+  },
+  {
+    "name": "arctic_twilight",
+    "colors": [
+      "#42425b",
+      "#97aec4",
+      "#c5d0cb",
+      "#5e76a2"
+    ]
+  },
+  {
+    "name": "badlands_dusk",
+    "colors": [
+      "#c2938f",
+      "#31241c",
+      "#8b6b64",
+      "#5e463e"
+    ]
+  },
+  {
+    "name": "olive_grove",
+    "colors": [
+      "#8aa452",
+      "#d4c8ae",
+      "#65794b",
+      "#454d53"
+    ]
+  },
+  {
+    "name": "evergreen_marsh",
+    "colors": [
+      "#d7d8a9",
+      "#668b66",
+      "#203536",
+      "#466157"
+    ]
+  },
+  {
+    "name": "desert_storm",
+    "colors": [
+      "#624f3a",
+      "#a2845e",
+      "#39261d",
+      "#e7d1a7"
+    ]
+  },
+  {
+    "name": "savanna_gold",
+    "colors": [
+      "#7e5935",
+      "#a59f6e",
+      "#948958",
+      "#c1ba8b"
+    ]
+  },
+  {
+    "name": "forest_twilight",
+    "colors": [
+      "#1d220f",
+      "#525e2e",
+      "#85924c",
+      "#bdc686"
+    ]
+  },
+  {
+    "name": "alpine_meadow",
+    "colors": [
+      "#e1e9dd",
+      "#93a388",
+      "#b9c6b1",
+      "#7fb959"
+    ]
+  },
+  {
+    "name": "coastal_rocks",
+    "colors": [
+      "#b7d6c9",
+      "#376671",
+      "#66a7ac",
+      "#183135"
+    ]
+  },
+  {
+    "name": "mountain_shadow",
+    "colors": [
+      "#4a4047",
+      "#6a5156",
+      "#d9d7b2",
+      "#6da263"
+    ]
+  },
+  {
+    "name": "desert_mirage",
+    "colors": [
+      "#fcf8e8",
+      "#ba9368",
+      "#d9c18f",
+      "#7c5348"
+    ]
+  },
+  {
+    "name": "emerald_forest",
+    "colors": [
+      "#2d572e",
+      "#87a24c",
+      "#728239",
+      "#4a7238"
+    ]
+  },
+  {
+    "name": "urban_fog",
+    "colors": [
+      "#ece9e3",
+      "#97a5b1",
+      "#1b2048",
+      "#5a6979"
+    ]
+  },
+  {
+    "name": "desert_harvest",
+    "colors": [
+      "#6d4a21",
+      "#c39e61",
+      "#e4c483",
+      "#9c7742"
+    ]
+  },
+  {
+    "name": "arctic_ice",
+    "colors": [
+      "#a5c4e0",
+      "#152142",
+      "#4978a7",
+      "#1d4171"
+    ]
+  },
+  {
+    "name": "night_ops",
+    "colors": [
+      "#03040a",
+      "#bbd3e8",
+      "#26528f",
+      "#143149"
+    ]
+  },
+  {
+    "name": "desert_oasis",
+    "colors": [
+      "#caa77f",
+      "#e0ccb2",
+      "#7d442a",
+      "#a97a53"
+    ]
+  },
+  {
+    "name": "woodland_shadow",
+    "colors": [
+      "#d5cec6",
+      "#b6a590",
+      "#1f3129",
+      "#8d705c"
+    ]
+  },
+  {
+    "name": "woodland_forest",
+    "colors": [
+      "#172225",
+      "#86563c",
+      "#a18f69",
+      "#214e3d"
+    ]
+  },
+  {
+    "name": "grassland_shadow",
+    "colors": [
+      "#232e20",
+      "#8c9261",
+      "#515b40",
+      "#d3ce91"
+    ]
+  },
+  {
+    "name": "misty_meadow",
+    "colors": [
+      "#c5c7aa",
+      "#839689",
+      "#9db29d",
+      "#66726e"
+    ]
+  },
+  {
+    "name": "twilight_tundra",
+    "colors": [
+      "#5d6081",
+      "#cacfe0",
+      "#88a0c8",
+      "#2f2b58"
+    ]
+  },
+  {
+    "name": "golden_savanna",
+    "colors": [
+      "#c3b462",
+      "#110f09",
+      "#605620",
+      "#7d7f33"
+    ]
+  },
+  {
+    "name": "mossy_glade",
+    "colors": [
+      "#56673a",
+      "#b7c882",
+      "#93ad71",
+      "#7f9763"
+    ]
+  },
+  {
+    "name": "arctic_waters",
+    "colors": [
+      "#5e8fa8",
+      "#5fa2bc",
+      "#87a8b4",
+      "#a7c2cd"
+    ]
+  },
+  {
+    "name": "desert_sunset",
+    "colors": [
+      "#f2debc",
+      "#d1b08c",
+      "#a98564",
+      "#79563c"
+    ]
+  },
+  {
+    "name": "jungle_mist",
+    "colors": [
+      "#437a41",
+      "#7dab53",
+      "#2d3a20",
+      "#a3c759"
+    ]
+  },
+  {
+    "name": "arctic_night",
+    "colors": [
+      "#30476a",
+      "#7ca2ce",
+      "#56759c",
+      "#9dc8ee"
+    ]
+  },
+  {
+    "name": "canyon_dust",
+    "colors": [
+      "#c7966c",
+      "#efd6bc",
+      "#89552e",
+      "#dbbb9b"
+    ]
+  },
+  {
+    "name": "urban_ash",
+    "colors": [
+      "#221716",
+      "#faf9f8",
+      "#8d2018",
+      "#8f8787"
+    ]
+  },
+  {
+    "name": "glacier_blue",
+    "colors": [
+      "#7db0e2",
+      "#afd9fc",
+      "#1561ac",
+      "#498ac7"
+    ]
+  },
+  {
+    "name": "savanna_dry",
+    "colors": [
+      "#cbcb66",
+      "#372e12",
+      "#98943d",
+      "#655c26"
+    ]
+  },
+  {
+    "name": "rainforest_canopy",
+    "colors": [
+      "#779a3f",
+      "#10170f",
+      "#44572a",
+      "#b4d67f"
+    ]
+  },
+  {
+    "name": "coastal_reef",
+    "colors": [
+      "#2e5768",
+      "#193439",
+      "#adcdd2",
+      "#4c8296"
+    ]
+  },
+  {
+    "name": "spring_forest",
+    "colors": [
+      "#4a6c2f",
+      "#94b321",
+      "#1e3300",
+      "#d3e4aa"
+    ]
+  },
+  {
+    "name": "desert_rock",
+    "colors": [
+      "#3d2b1f",
+      "#7f6855",
+      "#b9a89e",
+      "#e0d5c5"
+    ]
+  },
+  {
+    "name": "arctic_sky",
+    "colors": [
+      "#2c4875",
+      "#7ca0cf",
+      "#e5edf6",
+      "#0e1c2f"
+    ]
+  },
+  {
+    "name": "mesa_sunset",
+    "colors": [
+      "#5d3a1a",
+      "#b76f36",
+      "#f3c98b",
+      "#2f1e0e"
+    ]
+  },
+  {
+    "name": "green_seas",
+    "colors": [
+      "#1e434a",
+      "#4b8f8c",
+      "#9ed0cb",
+      "#e1f1f0"
+    ]
+  },
+  {
+    "name": "volcanic_ash",
+    "colors": [
+      "#4e2e2e",
+      "#8c5b5b",
+      "#c69494",
+      "#e0c2c2"
+    ]
+  },
+  {
+    "name": "pine_forest",
+    "colors": [
+      "#2a3c24",
+      "#5d7052",
+      "#a3b18a",
+      "#dde2d4"
+    ]
+  },
+  {
+    "name": "lava_field",
+    "colors": [
+      "#3c1518",
+      "#69140e",
+      "#a44200",
+      "#d58936"
+    ]
+  },
+  {
+    "name": "coastal_twilight",
+    "colors": [
+      "#2b3a67",
+      "#496a81",
+      "#66999b",
+      "#b3af8f"
+    ]
+  },
+  {
+    "name": "purple_night",
+    "colors": [
+      "#1c1f33",
+      "#3d3b6d",
+      "#7678af",
+      "#b3b3f1"
+    ]
+  },
+  {
+    "name": "lavender_mist",
+    "colors": [
+      "#3e2f5b",
+      "#724e91",
+      "#a682ff",
+      "#e5cdff"
+    ]
+  },
+  {
+    "name": "moss_forest",
+    "colors": [
+      "#2c5530",
+      "#5e8c61",
+      "#98bf64",
+      "#e0e868"
+    ]
+  },
+  {
+    "name": "cod_01",
+    "colors": [
+      "#8f8282",
+      "#322d2f",
+      "#fd2740"
+    ]
+  },
+  {
+    "name": "cod_02",
+    "colors": [
+      "#128bcf",
+      "#33343a",
+      "#17f45a"
+    ]
+  },
+  {
+    "name": "cod_03",
+    "colors": [
+      "#312f30",
+      "#6a6564",
+      "#f65a43"
+    ]
+  },
+  {
+    "name": "cod_04",
+    "colors": [
+      "#e3e2de",
+      "#9442fd",
+      "#9c979b"
+    ]
+  },
+  {
+    "name": "cod_05",
+    "colors": [
+      "#dedcd6",
+      "#3f3d8e",
+      "#fd4f55"
+    ]
+  },
+  {
+    "name": "cod_06",
+    "colors": [
+      "#a0d851",
+      "#424b48",
+      "#ebece9"
+    ]
+  },
+  {
+    "name": "cod_07",
+    "colors": [
+      "#fa6611",
+      "#373632",
+      "#e8435b"
+    ]
+  },
+  {
+    "name": "cod_08",
+    "colors": [
+      "#594ab6",
+      "#3be8f6",
+      "#3a454a"
+    ]
+  },
+  {
+    "name": "cod_09",
+    "colors": [
+      "#e5d327",
+      "#4b4c40",
+      "#7b7b7b"
+    ]
+  },
+  {
+    "name": "cod_10",
+    "colors": [
+      "#e65d35",
+      "#4e4f4a",
+      "#727527"
+    ]
+  },
+  {
+    "name": "cod_11",
+    "colors": [
+      "#b49a71",
+      "#33312d",
+      "#462f20"
+    ]
+  },
+  {
+    "name": "cod_12",
+    "colors": [
+      "#79b558",
+      "#584c35",
+      "#363636"
+    ]
+  },
+  {
+    "name": "cod_13",
+    "colors": [
+      "#ee1f48",
+      "#ff6f55",
+      "#e3d6b6",
+      "#46403d"
+    ]
+  },
+  {
+    "name": "cod_14",
+    "colors": [
+      "#a29648",
+      "#f5c24b",
+      "#bd6538",
+      "#4c4a46"
+    ]
+  },
+  {
+    "name": "cod_15",
+    "colors": [
+      "#5a5e61",
+      "#202322",
+      "#eb6641",
+      "#cdc0be"
+    ]
+  }
+]
