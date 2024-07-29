@@ -4,6 +4,48 @@
 
 GOCAMO is a Go program that generates military styled digital camouflage patterns. The patterns can be generated using custom color palettes specified in a JSON file or via command-line arguments. Images are saved in PNG format in the specified `output` directory. The output filename shows the HEX colors used and the resolution of the image. Two or more colors can be used in pattern palettes.
 
+## Features
+
+- Generate digital camouflage patterns with customisable colors
+- Specify colors directly via command line or use a JSON file for batch processing
+- Adjustable image dimensions
+- Configurable base pixel size for different pattern granularity
+- Output images include color codes in the filename for easy reference
+- Multi-core processing for improved performance when generating multiple patterns 
+
+## Generation Speed
+
+Generation speed depends on the number of images, resolution, and base pixel size. Higher resolution and smaller base pixel sizes require more processing time. The program uses Go's concurrency features to leverage multiple CPU cores when processing multiple color palettes from a JSON file, significantly improving performance on multi-core systems.
+
+## Pattern Generators
+
+### box (set using `-t box`, default if no type specified)
+The BoxGenerator creates a pattern with more angular, square-like shapes. It uses a grid-based approach with cellular automaton rules to create clusters, and then adds larger squares randomly. This results in a pattern with distinct, straight-edged shapes characteristic of digital camouflage.
+
+```terminal
+gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t blob -w 900 -h 900
+```
+
+![Sample Images](samples/box.png)
+
+### blob (set using `-t blob`)
+The BlobGenerator creates a pattern with more organic, blob-like shapes. It also uses a grid and cellular automaton approach, but with different rules that result in smoother, more curved shapes. This process creates a pattern that looks more like traditional camouflage with organic shapes.
+
+```terminal
+gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t box -w 900 -h 900
+```
+
+![Sample Images](samples/blob.png)
+
+### image (set using `-t image`, uses images in the `input` directory, )
+The ImageGenerator processes an input image to create a camouflage-like pattern based on the original image's colors and features. Loads the input image and resizes it to the target dimensions while maintaining aspect ratio. Applies max pooling to reduce the image size and enhance prominent features. Applies a Laplacian filter to enhance edges and details in the image. Uses k-means clustering to extract the main colors from the processed image. Maps each pixel in the processed image to the closest main color.
+
+```terminal
+gocamo -t image -w 900 -h 900
+```
+
+![Sample Images](samples/image.jpg)
+
 ## Installing
 
 To install GOCAMO, you need to have Go installed on your system (https://go.dev/doc/install). Once you have Go installed, 
@@ -94,23 +136,10 @@ Usage of ./gocamo:
   -o string
     	The output directory for generated images (default "output")
   -t string
-    	Set the pattern type (blob, box, or image) (default "blob")
+    	Set the pattern type (blob, box, or image) (default "box")
   -w int
     	Set the image width (default 1500)
 ```
-
-## Features
-
-- Generate digital camouflage patterns with customisable colors
-- Specify colors directly via command line or use a JSON file for batch processing
-- Adjustable image dimensions
-- Configurable base pixel size for different pattern granularity
-- Output images include color codes in the filename for easy reference
-- Multi-core processing for improved performance when generating multiple patterns 
-
-## Generation Speed
-
-Generation speed depends on the number of images, resolution, and base pixel size. Higher resolution and smaller base pixel sizes require more processing time. The program uses Go's concurrency features to leverage multiple CPU cores when processing multiple color palettes from a JSON file, significantly improving performance on multi-core systems.
 
 ## JSON Input Format
 
@@ -138,20 +167,6 @@ When using the `-j` flag to process multiple patterns, you need to provide a JSO
   }
 ]
 ```
-
-## Sample Images
-
-Full resolution output images can be found in `output` folder of this repo.
-
-```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -w 900 -h 900
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -w 900 -h 900 -t box
-```
-![Sample Images](samples/grid_custom.jpg)
-
-### Using photos image as reference `-t image`
-
-![Sample Images](samples/grid_image_001.jpg)
 
 ### Other examples using `colors.json` color palettes
 

@@ -18,12 +18,18 @@ type ImageGenerator struct {
 }
 
 func (ig *ImageGenerator) Generate(ctx context.Context, cfg *config.Config, _ []color.RGBA) (image.Image, []color.RGBA, error) {
+	// Adjust base pixel size to fit perfectly within the dimensions
+	adjustedBasePixelSize := cfg.BasePixelSize
+	for cfg.Width%adjustedBasePixelSize != 0 || cfg.Height%adjustedBasePixelSize != 0 {
+		adjustedBasePixelSize--
+	}
+
 	inputImg, err := utils.LoadImage(ig.InputFile)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error loading image: %w", err)
 	}
 	resized := resizeAndCropImage(inputImg, cfg.Width, cfg.Height)
-	pooled := maxPooling(resized, cfg.BasePixelSize)
+	pooled := maxPooling(resized, adjustedBasePixelSize)
 	enhanced := laplacianFilter(pooled)
 	bounds := enhanced.Bounds()
 	pixels := make([]color.Color, 0, bounds.Dx()*bounds.Dy())
@@ -58,7 +64,7 @@ func (ig *ImageGenerator) Generate(ctx context.Context, cfg *config.Config, _ []
 	}
 
 	if cfg.AddEdge {
-		addEdgeDetailsRGBA(result, cfg.BasePixelSize)
+		addEdgeDetailsRGBA(result, adjustedBasePixelSize)
 	}
 	return result, mainColors, nil
 }

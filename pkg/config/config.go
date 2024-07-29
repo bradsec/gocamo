@@ -38,7 +38,7 @@ func ParseFlags() *Config {
 	flag.IntVar(&cfg.Cores, "cores", runtime.NumCPU(), fmt.Sprintf("Number of CPU cores to use (1-%d available)", runtime.NumCPU()))
 	flag.BoolVar(&cfg.AddEdge, "edge", false, "Add edge details to the pattern")
 	flag.BoolVar(&cfg.AddNoise, "noise", false, "Add noise to the pattern")
-	flag.StringVar(&cfg.PatternType, "t", "blob", "Set the pattern type (blob, box, or image)")
+	flag.StringVar(&cfg.PatternType, "t", "box", "Set the pattern type (blob, box, or image)")
 	flag.StringVar(&cfg.ImageDir, "i", "input", "Input directory containing images for image-based camouflage")
 	flag.IntVar(&cfg.KValue, "k", 4, "Number of main colors for image-based camouflage")
 

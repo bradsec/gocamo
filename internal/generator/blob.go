@@ -12,10 +12,19 @@ import (
 type BlobGenerator struct{}
 
 func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
+	// Adjust base pixel size to fit perfectly within the dimensions
+	adjustedBasePixelSize := cfg.BasePixelSize
+	for cfg.Width%adjustedBasePixelSize != 0 || cfg.Height%adjustedBasePixelSize != 0 {
+		adjustedBasePixelSize--
+	}
+
 	img := image.NewNRGBA(image.Rect(0, 0, cfg.Width, cfg.Height))
 
-	// Create the pattern grid
-	patternWidth, patternHeight := cfg.Width/cfg.BasePixelSize, cfg.Height/cfg.BasePixelSize
+	// Adjust the scale factor to create smaller blobs
+	scaleFactor := 1
+
+	// Create the pattern grid with smaller cells
+	patternWidth, patternHeight := cfg.Width/(adjustedBasePixelSize*scaleFactor), cfg.Height/(adjustedBasePixelSize*scaleFactor)
 	pattern := make([][]int, patternHeight)
 	for y := range pattern {
 		pattern[y] = make([]int, patternWidth)
@@ -25,14 +34,15 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 	}
 
 	// Apply cellular automata to create clustered blob regions
-	for i := 0; i < 5; i++ {
+	iterations := 3
+	for i := 0; i < iterations; i++ {
 		newPattern := make([][]int, patternHeight)
 		for y := range newPattern {
 			newPattern[y] = make([]int, patternWidth)
 			for x := range newPattern[y] {
 				colorCounts := make(map[int]int)
-				for dy := -2; dy <= 2; dy++ {
-					for dx := -3; dx <= 3; dx++ {
+				for dy := -1; dy <= 1; dy++ {
+					for dx := -1; dx <= 1; dx++ {
 						ny, nx := (y+dy+patternHeight)%patternHeight, (x+dx+patternWidth)%patternWidth
 						colorCounts[pattern[ny][nx]]++
 					}
@@ -52,7 +62,8 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 	// Draw the pattern
 	for y := 0; y < cfg.Height; y++ {
 		for x := 0; x < cfg.Width; x++ {
-			patternY, patternX := y/cfg.BasePixelSize, x/cfg.BasePixelSize
+			patternY := (y / (adjustedBasePixelSize * scaleFactor)) % patternHeight
+			patternX := (x / (adjustedBasePixelSize * scaleFactor)) % patternWidth
 			colorIndex := pattern[patternY][patternX]
 			c := colors[colorIndex]
 			img.Set(x, y, c)
@@ -64,7 +75,7 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 	}
 
 	if cfg.AddEdge {
-		addEdgeDetailsNRGBA(img, cfg.BasePixelSize)
+		addEdgeDetailsNRGBA(img, adjustedBasePixelSize)
 	}
 
 	return img, nil
