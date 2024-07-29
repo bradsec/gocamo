@@ -17,7 +17,7 @@ GOCAMO is a Go program that generates military styled digital camouflage pattern
 
 Generation speed depends on the number of images, resolution, and base pixel size. Higher resolution and smaller base pixel sizes require more processing time. The program uses Go's concurrency features to leverage multiple CPU cores when processing multiple color palettes from a JSON file, significantly improving performance on multi-core systems.
 
-## Pattern Generators
+## Pattern Types (box, blob, image)
 
 ### box (set using `-t box`, default if no type specified)
 The BoxGenerator creates a pattern with more angular, square-like shapes. It uses a grid-based approach with cellular automaton rules to create clusters, and then adds larger squares randomly. This results in a pattern with distinct, straight-edged shapes characteristic of digital camouflage.
@@ -167,14 +167,6 @@ When using the `-j` flag to process multiple patterns, you need to provide a JSO
   }
 ]
 ```
-
-### Other examples using `colors.json` color palettes
-
-![Sample Images](samples/grid_001.jpg)
-![Sample Images](samples/grid_002.jpg)
-![Sample Images](samples/grid_003.jpg)
-![Sample Images](samples/grid_004.jpg)
-![Sample Images](samples/grid_005.jpg)
 
 ## License
 
