@@ -87,10 +87,10 @@ go build -o gocamo ./cmd/gocamo
 
 1. Generate a single pattern with specified colors (defaults to blob pattern):
    ```
-   # Defaults to blob pattern
-   gocamo -c "#ffffff,#012169,#e4002b"
+   # Three color blob pattern
+   gocamo -c "#ffffff,#012169,#e4002b" -t blob
 
-   # Change pattern to box or pixelated use -t box
+   # Three color box pattern
    gocamo -c "#ffffff,#012169,#e4002b" -t box
    ```
 
@@ -99,8 +99,8 @@ go build -o gocamo ./cmd/gocamo
    # All color schemes as blob patterns
    gocamo -j colors.json
 
-   # All color schemes as box or pixelated patterns
-   gocamo -j colors.json -t box
+   # Process all color schemes in `colors.json`
+   gocamo -j colors.json
    ```
 
 3. Make pattern from images use `-t image`, this option looks in the image input directory default `input` and processes the images, identifying clusters of colors to produce patterns based on the images. Will batch process any images in the directory. Change input directory with `-i` flag. Use `-b` to increase block pixel size in output pattern.
@@ -126,6 +126,18 @@ go build -o gocamo ./cmd/gocamo
 6. Use specific number of CPU cores:
    ```
    gocamo -j colors.json -cores 4
+   ```
+7. Add noise to image (larger file size)
+   ```
+   gocamo -c "#ffffff,#012169,#e4002b" -noise
+   ```
+8. Add edge details to image (larger file size)
+   ```
+   gocamo -c "#ffffff,#012169,#e4002b" -edge
+   ```
+9. Add noise and edge details (largest file size)
+   ```
+   gocamo -c "#ffffff,#012169,#e4002b" -noise -edge
    ```
 
 ## Paths
