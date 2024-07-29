@@ -12,6 +12,10 @@ import (
 type BoxGenerator struct{}
 
 func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
+
+	// Shuffle the colors
+	shuffledColors := shuffleColors(colors)
+
 	// Adjust base pixel size to fit perfectly within the dimensions
 	adjustedBasePixelSize := cfg.BasePixelSize
 	for cfg.Width%adjustedBasePixelSize != 0 || cfg.Height%adjustedBasePixelSize != 0 {
@@ -33,7 +37,7 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 	// Generate initial random color assignment
 	for y := 0; y < cellHeight; y++ {
 		for x := 0; x < cellWidth; x++ {
-			grid[y][x] = rand.Intn(len(colors))
+			grid[y][x] = rand.Intn(len(shuffledColors))
 		}
 	}
 
@@ -96,14 +100,14 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 			cellY := y / adjustedBasePixelSize
 			cellX := x / adjustedBasePixelSize
 			if cellY < cellHeight && cellX < cellWidth {
-				color := colors[grid[cellY][cellX]]
+				color := shuffledColors[grid[cellY][cellX]]
 				img.Set(x, y, color)
 			}
 		}
 	}
 
 	if cfg.AddNoise {
-		addNoiseNRGBA(img, colors)
+		addNoiseNRGBA(img, shuffledColors)
 	}
 
 	if cfg.AddEdge {

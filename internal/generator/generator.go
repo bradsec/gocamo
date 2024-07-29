@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"sort"
@@ -104,4 +105,13 @@ func sortColors(colors []color.RGBA) {
 		jSum := int(colors[j].R) + int(colors[j].G) + int(colors[j].B)
 		return iSum < jSum
 	})
+}
+
+func shuffleColors(colors []color.RGBA) []color.RGBA {
+	shuffled := make([]color.RGBA, len(colors))
+	copy(shuffled, colors)
+	rand.Shuffle(len(shuffled), func(i, j int) {
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	})
+	return shuffled
 }

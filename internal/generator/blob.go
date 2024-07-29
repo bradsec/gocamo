@@ -12,6 +12,10 @@ import (
 type BlobGenerator struct{}
 
 func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
+
+	// Shuffle the colors
+	shuffledColors := shuffleColors(colors)
+
 	// Adjust base pixel size to fit perfectly within the dimensions
 	adjustedBasePixelSize := cfg.BasePixelSize
 	for cfg.Width%adjustedBasePixelSize != 0 || cfg.Height%adjustedBasePixelSize != 0 {
@@ -29,7 +33,7 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 	for y := range pattern {
 		pattern[y] = make([]int, patternWidth)
 		for x := range pattern[y] {
-			pattern[y][x] = rand.Intn(len(colors))
+			pattern[y][x] = rand.Intn(len(shuffledColors))
 		}
 	}
 
@@ -65,13 +69,13 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 			patternY := (y / (adjustedBasePixelSize * scaleFactor)) % patternHeight
 			patternX := (x / (adjustedBasePixelSize * scaleFactor)) % patternWidth
 			colorIndex := pattern[patternY][patternX]
-			c := colors[colorIndex]
+			c := shuffledColors[colorIndex]
 			img.Set(x, y, c)
 		}
 	}
 
 	if cfg.AddNoise {
-		addNoiseNRGBA(img, colors)
+		addNoiseNRGBA(img, shuffledColors)
 	}
 
 	if cfg.AddEdge {
