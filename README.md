@@ -6,9 +6,7 @@ GOCAMO is a Go program that generates military-styled digital camouflage pattern
 
 ## Features
 
-- Generate digital camouflage patterns with customizable colors
-- Specify colors directly via command line or use a JSON file for batch processing
-- Adjustable image dimensions
+- Generate digital camouflage patterns with customizable colors, unique patterns, and any resolution
 - Configurable base pixel size for different pattern granularity
 - Output images include color codes in the filename for easy reference
 - Multi-core processing for improved performance when generating multiple patterns
@@ -45,14 +43,29 @@ gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t blob -w 900 -h 900
 
 ![Sample Images](samples/blob.png)
 
-### image (set using `-t image`, uses images in the `input` directory, )
+### image (set using `-t image`, uses images in the `input` directory as reference)
 The ImageGenerator processes an input image to create a camouflage-like pattern based on the original image's colors and features. Loads the input image and resizes it to the target dimensions while maintaining aspect ratio. Applies max pooling to reduce the image size and enhance prominent features. Applies a Laplacian filter to enhance edges and details in the image. Uses k-means clustering to extract the main colors from the processed image. Maps each pixel in the processed image to the closest main color.
+
+Reference (source) photo:
+
+![Sample Images](input/photo_jungle.jpg)
 
 ```terminal
 gocamo -t image -w 900 -h 900
 ```
 
-![Sample Images](samples/image.jpg)
+Pattern result with default `-b 4`:
+
+![Sample Images](samples/imageb4.png)
+
+```terminal
+gocamo -t image -w 900 -h 900 -b 10
+```
+
+Pattern result with `-b 10`:
+
+![Sample Images](samples/imageb10.png)
+
 
 ## Installing
 
