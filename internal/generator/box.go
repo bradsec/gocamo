@@ -12,7 +12,6 @@ import (
 type BoxGenerator struct{}
 
 func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
-
 	// Shuffle the colors
 	shuffledColors := shuffleColors(colors)
 
@@ -51,10 +50,11 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 
 		for y := 0; y < cellHeight; y++ {
 			for x := 0; x < cellWidth; x++ {
-				// Count neighboring colors
+				// Count neighboring colors with variable neighborhood size
+				neighborhoodSize := rand.Intn(3) + 1 // 1, 2, or 3
 				colorCount := make(map[int]int)
-				for dy := -1; dy <= 1; dy++ {
-					for dx := -1; dx <= 1; dx++ {
+				for dy := -neighborhoodSize; dy <= neighborhoodSize; dy++ {
+					for dx := -neighborhoodSize; dx <= neighborhoodSize; dx++ {
 						ny, nx := (y+dy+cellHeight)%cellHeight, (x+dx+cellWidth)%cellWidth
 						colorCount[grid[ny][nx]]++
 					}
@@ -63,7 +63,7 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 				// Find the most common color
 				maxCount, maxColor := 0, grid[y][x]
 				for color, count := range colorCount {
-					if count > maxCount {
+					if count > maxCount || (count == maxCount && rand.Float32() < 0.3) {
 						maxCount, maxColor = count, color
 					}
 				}
@@ -78,15 +78,26 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 		grid = newGrid
 	}
 
-	// Create larger squares
-	maxSquareSize := 4 // Maximum size of larger squares
-	for y := 0; y < cellHeight; y += maxSquareSize {
-		for x := 0; x < cellWidth; x += maxSquareSize {
-			if rand.Float32() < 0.3 { // 30% chance to create a larger square
+	// Create larger squares and rectangles
+	maxSize := 8 // Maximum size of larger shapes
+	for y := 0; y < cellHeight; y += maxSize / 2 {
+		for x := 0; x < cellWidth; x += maxSize / 2 {
+			if rand.Float32() < 0.3 { // 30% chance to create a larger shape
+				shapeType := rand.Intn(3) // 0: square, 1: horizontal rectangle, 2: vertical rectangle
+				width := rand.Intn(maxSize) + 1
+				height := rand.Intn(maxSize) + 1
+
+				if shapeType == 1 {
+					width = rand.Intn(maxSize) + maxSize/2 // Wider
+					height = rand.Intn(maxSize/2) + 1      // Shorter
+				} else if shapeType == 2 {
+					width = rand.Intn(maxSize/2) + 1        // Narrower
+					height = rand.Intn(maxSize) + maxSize/2 // Taller
+				}
+
 				color := grid[y][x]
-				size := rand.Intn(maxSquareSize) + 1 // Random size between 1 and maxSquareSize
-				for dy := 0; dy < size && y+dy < cellHeight; dy++ {
-					for dx := 0; dx < size && x+dx < cellWidth; dx++ {
+				for dy := 0; dy < height && y+dy < cellHeight; dy++ {
+					for dx := 0; dx < width && x+dx < cellWidth; dx++ {
 						grid[y+dy][x+dx] = color
 					}
 				}

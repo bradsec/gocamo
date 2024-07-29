@@ -2,28 +2,36 @@
 
 ## A digital camouflage pattern image generator written in Go
 
-GOCAMO is a Go program that generates military styled digital camouflage patterns. The patterns can be generated using custom color palettes specified in a JSON file or via command-line arguments. Images are saved in PNG format in the specified `output` directory. The output filename shows the HEX colors used and the resolution of the image. Two or more colors can be used in pattern palettes.
+GOCAMO is a Go program that generates military-styled digital camouflage patterns. The patterns can be generated using custom color palettes specified in a JSON file or via command-line arguments. Images are saved in PNG format in the specified `output` directory. The output filename shows the HEX colors used and the resolution of the image. Two or more colors can be used in pattern palettes.
 
 ## Features
 
-- Generate digital camouflage patterns with customisable colors
+- Generate digital camouflage patterns with customizable colors
 - Specify colors directly via command line or use a JSON file for batch processing
 - Adjustable image dimensions
 - Configurable base pixel size for different pattern granularity
 - Output images include color codes in the filename for easy reference
-- Multi-core processing for improved performance when generating multiple patterns 
+- Multi-core processing for improved performance when generating multiple patterns
 
 ## Generation Speed
 
 Generation speed depends on the number of images, resolution, and base pixel size. Higher resolution and smaller base pixel sizes require more processing time. The program uses Go's concurrency features to leverage multiple CPU cores when processing multiple color palettes from a JSON file, significantly improving performance on multi-core systems.
 
+## Optimized File Size
+
+The program will produce optimized small PNG file sizes for high-resolution patterns (when generating without `-noise` or `-edge`):
+- 280kB for a 4K image (`-w 3840 -h 2160`)
+- 1.6MB for a 4K image with `-noise` added
+- 9.4MB for a 4K image with `-edge` details added
+- 10.5MB for a 4K image with `-noise` and `-edge` details added
+
 ## Pattern Types (box, blob, image)
 
 ### box (set using `-t box`, default if no type specified)
-The BoxGenerator creates a pattern with more angular, square-like shapes. It uses a grid-based approach with cellular automaton rules to create clusters, and then adds larger squares randomly. This results in a pattern with distinct, straight-edged shapes characteristic of digital camouflage.
+The BoxGenerator creates a pattern with angular, square-like shapes characteristic of digital camouflage. It uses a grid-based approach with cellular automaton rules to create clusters, and then adds larger squares and rectangles randomly. This results in a pattern with distinct, straight-edged shapes of various sizes, creating a more diverse and randomized appearance.
 
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t blob -w 900 -h 900
+gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t box -w 900 -h 900
 ```
 
 ![Sample Images](samples/box.png)
@@ -32,7 +40,7 @@ gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t blob -w 900 -h 900
 The BlobGenerator creates a pattern with more organic, blob-like shapes. It also uses a grid and cellular automaton approach, but with different rules that result in smoother, more curved shapes. This process creates a pattern that looks more like traditional camouflage with organic shapes.
 
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t box -w 900 -h 900
+gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t blob -w 900 -h 900
 ```
 
 ![Sample Images](samples/blob.png)

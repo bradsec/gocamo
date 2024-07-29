@@ -25,7 +25,7 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 	img := image.NewNRGBA(image.Rect(0, 0, cfg.Width, cfg.Height))
 
 	// Adjust the scale factor to create smaller blobs
-	scaleFactor := 1
+	scaleFactor := 2
 
 	// Create the pattern grid with smaller cells
 	patternWidth, patternHeight := cfg.Width/(adjustedBasePixelSize*scaleFactor), cfg.Height/(adjustedBasePixelSize*scaleFactor)
