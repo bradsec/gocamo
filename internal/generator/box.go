@@ -40,7 +40,7 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 		}
 	}
 
-	// Apply cellular automaton rules to create larger clusters
+	// Apply cellular automaton rules to create clusters
 	for i := 0; i < 3; i++ {
 		newGrid := make([][]int, cellHeight)
 		for y := range newGrid {
@@ -51,7 +51,7 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 		for y := 0; y < cellHeight; y++ {
 			for x := 0; x < cellWidth; x++ {
 				// Count neighboring colors with variable neighborhood size
-				neighborhoodSize := rand.Intn(3) + 1 // 1, 2, or 3
+				neighborhoodSize := rand.Intn(2) + 1 // 1 or 2
 				colorCount := make(map[int]int)
 				for dy := -neighborhoodSize; dy <= neighborhoodSize; dy++ {
 					for dx := -neighborhoodSize; dx <= neighborhoodSize; dx++ {
@@ -111,8 +111,7 @@ func (bg *BoxGenerator) Generate(ctx context.Context, cfg *config.Config, colors
 			cellY := y / adjustedBasePixelSize
 			cellX := x / adjustedBasePixelSize
 			if cellY < cellHeight && cellX < cellWidth {
-				color := shuffledColors[grid[cellY][cellX]]
-				img.Set(x, y, color)
+				img.Set(x, y, shuffledColors[grid[cellY][cellX]])
 			}
 		}
 	}
