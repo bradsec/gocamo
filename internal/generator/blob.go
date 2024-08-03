@@ -12,6 +12,7 @@ import (
 type BlobGenerator struct{}
 
 func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
+
 	// Shuffle the colors
 	shuffledColors := shuffleColors(colors)
 
@@ -23,10 +24,10 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 
 	img := image.NewNRGBA(image.Rect(0, 0, cfg.Width, cfg.Height))
 
-	// Adjust the scale factor to create more varied blob sizes
-	scaleFactor := rand.Intn(3) + 1 // 1, 2, or 3
+	// Adjust the scale factor to create smaller blobs
+	scaleFactor := 2
 
-	// Create the pattern grid with variable cell sizes
+	// Create the pattern grid with smaller cells
 	patternWidth, patternHeight := cfg.Width/(adjustedBasePixelSize*scaleFactor), cfg.Height/(adjustedBasePixelSize*scaleFactor)
 	pattern := make([][]int, patternHeight)
 	for y := range pattern {
@@ -37,16 +38,15 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 	}
 
 	// Apply cellular automata to create clustered blob regions
-	iterations := rand.Intn(3) + 2 // 2 to 4 iterations
+	iterations := 3
 	for i := 0; i < iterations; i++ {
 		newPattern := make([][]int, patternHeight)
 		for y := range newPattern {
 			newPattern[y] = make([]int, patternWidth)
 			for x := range newPattern[y] {
 				colorCounts := make(map[int]int)
-				neighborhoodSize := rand.Intn(2) + 1 // 1 or 2
-				for dy := -neighborhoodSize; dy <= neighborhoodSize; dy++ {
-					for dx := -neighborhoodSize; dx <= neighborhoodSize; dx++ {
+				for dy := -1; dy <= 1; dy++ {
+					for dx := -1; dx <= 1; dx++ {
 						ny, nx := (y+dy+patternHeight)%patternHeight, (x+dx+patternWidth)%patternWidth
 						colorCounts[pattern[ny][nx]]++
 					}
@@ -61,23 +61,6 @@ func (bg *BlobGenerator) Generate(ctx context.Context, cfg *config.Config, color
 			}
 		}
 		pattern = newPattern
-	}
-
-	// Introduce larger blob areas
-	for i := 0; i < patternHeight*patternWidth/20; i++ { // Create several larger blobs
-		y, x := rand.Intn(patternHeight), rand.Intn(patternWidth)
-		color := rand.Intn(len(shuffledColors))
-		blobSize := rand.Intn(patternHeight/4) + patternHeight/8 // Varied blob sizes
-		for dy := -blobSize; dy <= blobSize; dy++ {
-			for dx := -blobSize; dx <= blobSize; dx++ {
-				if dx*dx+dy*dy <= blobSize*blobSize { // Circular blob shape
-					ny, nx := (y+dy+patternHeight)%patternHeight, (x+dx+patternWidth)%patternWidth
-					if rand.Float32() < 0.7 { // 70% chance to set the color, creating more organic edges
-						pattern[ny][nx] = color
-					}
-				}
-			}
-		}
 	}
 
 	// Draw the pattern
