@@ -66,21 +66,23 @@ Pattern result with `-b 10`:
 
 ![Sample Images](samples/imageb10.png)
 
-
 ## Installing
 
-To install GOCAMO, you need to have Go installed on your system (https://go.dev/doc/install). Once you have Go installed, 
+### Option 1 Download the pre-built Binary files from [Releases](https://github.com/bradsec/gocamo/releases)
+
+### Option 2 Use Go to install the latest version
+If you have Go installed (https://go.dev/doc/install) you can install the latest version of gocamo with this command:
+```terminal
+go install github.com/bradsec/gocamo/cmd/gocamo@latest
+````
+
+### Option 3 Clone Repo and Build
 
 ```terminal
-# 1. Clone the repo
 git clone https://github.com/bradsec/gocamo.git
-
 cd gocamo
-
-# 2. Build the applicaton
 go build -o gocamo ./cmd/gocamo
-
-# 3. Run the program see usage flags below
+# Copy the gocamo binary/executable to a directory in your system PATH
 ```
 
 ## Examples commands
