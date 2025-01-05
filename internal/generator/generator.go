@@ -20,7 +20,12 @@ type Generator interface {
 }
 
 func GeneratePattern(ctx context.Context, cfg *config.Config, camo config.CamoColors, index int, outputPath string) error {
+	if len(camo.Colors) == 0 {
+		return fmt.Errorf("no colors provided in color palette")
+	}
+
 	colors, err := utils.HexToRGBA(camo.Colors)
+
 	if err != nil {
 		return fmt.Errorf("error converting hex to RGBA: %w", err)
 	}

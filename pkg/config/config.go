@@ -3,7 +3,9 @@ package config
 import (
 	"flag"
 	"fmt"
+	"os"
 	"runtime"
+	"strings"
 )
 
 type Config struct {
@@ -26,6 +28,49 @@ type CamoColors struct {
 	Colors []string `json:"colors"`
 }
 
+func stripHash(hex string) string {
+	if len(hex) > 0 && hex[0] == '#' {
+		return hex[1:]
+	}
+	return hex
+}
+
+func validateHexColor(hex string) error {
+	hex = stripHash(strings.TrimSpace(hex))
+	if len(hex) != 3 && len(hex) != 6 {
+		return fmt.Errorf("invalid hex color length: %s (should be 6 characters or 3 for short form)", hex)
+	}
+	for _, c := range hex {
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+			return fmt.Errorf("invalid hex color character in %s", hex)
+		}
+	}
+	return nil
+}
+
+func cleanColorString(colors string) (string, error) {
+	// Remove all whitespace and split
+	parts := strings.Split(strings.ReplaceAll(colors, " ", ""), ",")
+	// Filter out empty strings and validate format
+	var cleaned []string
+	for _, p := range parts {
+		if p != "" {
+			// Validate hex color format
+			if err := validateHexColor(p); err != nil {
+				return "", fmt.Errorf("invalid color %s: %v", p, err)
+			}
+			cleaned = append(cleaned, p)
+		}
+	}
+
+	// Check minimum number of colors
+	if len(cleaned) < 2 {
+		return "", fmt.Errorf("at least 2 colors are required, got %d", len(cleaned))
+	}
+
+	return strings.Join(cleaned, ","), nil
+}
+
 func ParseFlags() *Config {
 	cfg := &Config{}
 
@@ -43,6 +88,33 @@ func ParseFlags() *Config {
 	flag.IntVar(&cfg.KValue, "k", 4, "Number of main colors for image-based camouflage")
 
 	flag.Parse()
+
+	if cfg.ColorsString != "" {
+		cleaned, err := cleanColorString(cfg.ColorsString)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		cfg.ColorsString = cleaned
+	}
+
+	// Validate cores
+	if cfg.Cores < 1 {
+		cfg.Cores = 1
+	} else if cfg.Cores > runtime.NumCPU() {
+		cfg.Cores = runtime.NumCPU()
+	}
+
+	// Validate dimensions
+	if cfg.Width < 1 {
+		cfg.Width = 1500 // default
+	}
+	if cfg.Height < 1 {
+		cfg.Height = 1500 // default
+	}
+	if cfg.BasePixelSize < 1 {
+		cfg.BasePixelSize = 4 // default
+	}
 
 	return cfg
 }

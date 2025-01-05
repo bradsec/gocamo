@@ -40,6 +40,10 @@ func run(cfg *config.Config) error {
 	var camoList []config.CamoColors
 	var imagePaths []string
 
+	if cfg.ColorsString != "" && strings.TrimSpace(cfg.ColorsString) == "" {
+		return fmt.Errorf("no valid colors provided in color string")
+	}
+
 	if cfg.PatternType == "image" {
 		imagePaths, err = utils.GetImageFiles(cfg.ImageDir)
 		if err != nil {
