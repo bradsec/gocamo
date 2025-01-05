@@ -44,7 +44,9 @@ func run(cfg *config.Config) error {
 		return fmt.Errorf("no valid colors provided in color string")
 	}
 
-	if cfg.PatternType == "image" {
+	// Handle input type and validation
+	switch cfg.PatternType {
+	case "image":
 		imagePaths, err = utils.GetImageFiles(cfg.ImageDir)
 		if err != nil {
 			return fmt.Errorf("failed to get image files: %w", err)
@@ -52,7 +54,7 @@ func run(cfg *config.Config) error {
 		if len(imagePaths) == 0 {
 			return fmt.Errorf("no image files found in directory: %s", cfg.ImageDir)
 		}
-	} else {
+	case "box", "blob":
 		if cfg.ColorsString != "" {
 			colors := strings.Split(cfg.ColorsString, ",")
 			camoList = append(camoList, config.CamoColors{Name: "custom", Colors: colors})
@@ -66,11 +68,17 @@ func run(cfg *config.Config) error {
 			if err := json.NewDecoder(file).Decode(&camoList); err != nil {
 				return fmt.Errorf("failed to decode JSON: %w", err)
 			}
+			if len(camoList) == 0 {
+				return fmt.Errorf("no color palettes found in JSON file")
+			}
 		} else {
 			return fmt.Errorf("no input specified. Use -c for colors, -j for JSON file, or -i for image directory")
 		}
+	default:
+		return fmt.Errorf("invalid pattern type: %s (must be 'box', 'blob', or 'image')", cfg.PatternType)
 	}
 
+	// Print configuration information
 	fmt.Printf("Generating patterns with dimensions %dx%d, base pixel size %d\n", cfg.Width, cfg.Height, cfg.BasePixelSize)
 	if cfg.PatternType == "image" {
 		fmt.Printf("Processing %d images using %d CPU cores\n", len(imagePaths), cfg.Cores)
@@ -81,29 +89,23 @@ func run(cfg *config.Config) error {
 	fmt.Printf("Add edge details: %v, Add noise: %v\n", cfg.AddEdge, cfg.AddNoise)
 	fmt.Printf("Output path: %s\n\n", outputAbsPath)
 
-	jobs := make(chan worker.Job, max(len(camoList), len(imagePaths)))
-	results := make(chan error, max(len(camoList), len(imagePaths)))
+	// Set up worker pools and channels
+	totalJobs := max(len(camoList), len(imagePaths))
+	jobs := make(chan worker.Job, totalJobs)
+	results := make(chan error, totalJobs)
 	progressDone := make(chan bool)
 	var wg sync.WaitGroup
 
+	// Start worker pool
 	for w := 1; w <= cfg.Cores; w++ {
 		wg.Add(1)
 		go worker.Work(jobs, results, &wg)
 	}
 
-	totalJobs := max(len(camoList), len(imagePaths))
+	// Start progress tracking
 	go utils.TrackProgress(results, totalJobs, progressDone)
 
-	if cfg.PatternType == "image" {
-		imagePaths, err := utils.GetImageFiles(cfg.ImageDir)
-		if err != nil {
-			return fmt.Errorf("failed to get image files: %w", err)
-		}
-		if len(imagePaths) == 0 {
-			return fmt.Errorf("no image files found in directory: %s", cfg.ImageDir)
-		}
-	}
-
+	// Queue jobs based on pattern type
 	if cfg.PatternType == "image" {
 		for i, imagePath := range imagePaths {
 			jobs <- worker.Job{
@@ -125,9 +127,9 @@ func run(cfg *config.Config) error {
 	}
 	close(jobs)
 
+	// Wait for all jobs to complete
 	wg.Wait()
 	close(results)
-
 	<-progressDone
 
 	duration := time.Since(startTime)

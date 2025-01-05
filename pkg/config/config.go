@@ -89,15 +89,6 @@ func ParseFlags() *Config {
 
 	flag.Parse()
 
-	if cfg.ColorsString != "" {
-		cleaned, err := cleanColorString(cfg.ColorsString)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-			os.Exit(1)
-		}
-		cfg.ColorsString = cleaned
-	}
-
 	// Validate cores
 	if cfg.Cores < 1 {
 		cfg.Cores = 1
@@ -116,5 +107,31 @@ func ParseFlags() *Config {
 		cfg.BasePixelSize = 4 // default
 	}
 
+	// If -i flag is used, set pattern type to "image"
+	if isFlagPassed("i") {
+		cfg.PatternType = "image"
+	}
+
+	// Clean and validate the colors string if provided
+	if cfg.ColorsString != "" {
+		cleaned, err := cleanColorString(cfg.ColorsString)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+			os.Exit(1)
+		}
+		cfg.ColorsString = cleaned
+	}
+
 	return cfg
+}
+
+// Helper function to check if a flag was explicitly passed
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
 }
