@@ -1,0 +1,57 @@
+name: Go Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.22.5'
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/go-build
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-mod-
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Build binaries for multiple platforms
+        run: |
+          cd cmd/gocamo
+          GOARCH=amd64 GOOS=linux go build -o ../../gocamo-linux-amd64
+          GOARCH=amd64 GOOS=windows go build -o ../../gocamo-windows-amd64.exe
+          GOARCH=amd64 GOOS=darwin go build -o ../../gocamo-darwin-amd64
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            gocamo-linux-amd64
+            gocamo-windows-amd64.exe
+            gocamo-darwin-amd64
+
+      - name: Add release description
+        run: |
+          RELEASE_TAG="${GITHUB_REF#refs/tags/}"
+          curl -s -X PATCH \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d "{\"body\":\"Release v${RELEASE_TAG} of the gocamo project. See the binaries attached.\"}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${RELEASE_TAG}"
