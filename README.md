@@ -105,7 +105,7 @@ Pattern result with default `-b 4` and 16 colors `k 16`:
 ![Sample Images](samples/imagek16.png)
 
 ```terminal
-gocamo -t image -w 900 -h 900 -k 16
+gocamo -t image -w 900 -h 900 -b 10 -k 16
 ```
 
 Pattern result with `-b 10` and 16 colors `k 16`:
