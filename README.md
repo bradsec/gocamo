@@ -68,7 +68,7 @@ gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat5 -w 900 -h 900
 ![Sample Images](samples/gocamo_004_custom_46482f_6d6851_9b967f_1e2415_pat5_w900x900.png)
 
 ### all (set using `-t all`)
-The all option generates patterns using all four pattern types (pat1, pat2, pat3, pat4) for each color palette provided. This is useful when you want to see all pattern variations for comparison or when generating a complete set of patterns from the same color scheme.
+The all option generates patterns using all five pattern types (pat1, pat2, pat3, pat4, pat5) for each color palette provided. This is useful when you want to see all pattern variations for comparison or when generating a complete set of patterns from the same color scheme.
 
 ```terminal
 gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t all -w 900 -h 900
@@ -168,7 +168,7 @@ go build -o gocamo ./cmd/gocamo
    # Process all color schemes in `colors.json` (defaults to pat1)
    gocamo -j colors.json
 
-   # Generate all 4 pattern types for each color scheme in JSON file
+   # Generate all 5 pattern types for each color scheme in JSON file
    gocamo -j colors.json -t all
    ```
 
@@ -237,8 +237,10 @@ Usage of ./gocamo:
     	Add noise to the pattern
   -o string
     	The output directory for generated images (default "output")
+  -r string
+    	Color ratios: 'random' for random ratios, integers like '2,1,3' (cycles if fewer than colors) (default: equal)
   -t string
-    	Set the pattern type (pat1, pat2, pat3, pat4, all, or image) (default "pat1")
+    	Set the pattern type (pat1, pat2, pat3, pat4, pat5, all, or image) (default "pat1")
   -w int
     	Set the image width (default 1500)
 ```
