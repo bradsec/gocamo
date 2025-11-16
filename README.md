@@ -4,7 +4,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/bradsec/gocamo)](https://goreportcard.com/report/github.com/bradsec/gocamo)
 
-GOCAMO is a Go program that generates military-styled digital camouflage patterns. The patterns can be generated using custom color palettes specified in a JSON file or via command-line arguments. Images are saved in PNG format in the specified `output` directory. The output filename shows the HEX colors used and the resolution of the image. Two or more colors can be used in pattern palettes for patterns pat1, pat2, pat3, pat4.
+GOCAMO is a Go program that generates military-styled digital camouflage patterns. The patterns can be generated using custom color palettes specified in a JSON file or via command-line arguments. Images are saved in PNG format in the specified `output` directory. The output filename shows the HEX colors used and the resolution of the image. Two or more colors can be used in pattern palettes for patterns pat1, pat2, pat3, pat4, pat5.
 
 ## Features
 
@@ -59,6 +59,14 @@ gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat4 -w 900 -h 900
 
 ![Sample Images](samples/gocamo_003_custom_46482f_6d6851_9b967f_1e2415_pat4_w900x900.png)
 
+### pat5 (set using `-t pat5`)
+
+```terminal
+gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat5 -w 900 -h 900
+```
+
+![Sample Images](samples/gocamo_004_custom_46482f_6d6851_9b967f_1e2415_pat5_w900x900.png)
+
 ### all (set using `-t all`)
 The all option generates patterns using all four pattern types (pat1, pat2, pat3, pat4) for each color palette provided. This is useful when you want to see all pattern variations for comparison or when generating a complete set of patterns from the same color scheme.
 
@@ -66,11 +74,12 @@ The all option generates patterns using all four pattern types (pat1, pat2, pat3
 gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t all -w 900 -h 900
 ```
 
-When using `-t all`, the tool will generate 4 patterns for each color palette:
+When using `-t all`, the tool will generate 5 patterns for each color palette:
 - One pattern using pat1 algorithm
 - One pattern using pat2 algorithm  
 - One pattern using pat3 algorithm
 - One pattern using pat4 algorithm
+- One pattern using pat5 algorithm
 
 ### image (set using `-t image`, uses images in the `input` directory as reference)
 The ImageGenerator processes an input image to create a camouflage-like pattern based on the original image's colors and features. Loads the input image and resizes it to the target dimensions while maintaining aspect ratio. Applies max pooling to reduce the image size and enhance prominent features. Applies a Laplacian filter to enhance edges and details in the image. Uses k-means clustering to extract the main colors from the processed image. Maps each pixel in the processed image to the closest main color.

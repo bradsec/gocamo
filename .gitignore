@@ -17,6 +17,7 @@ output/
 # Claude AI related files
 memories.json
 reflections.json
+CLAUDE.md
 *.claude.*
 .claude/
 

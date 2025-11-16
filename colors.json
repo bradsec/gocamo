@@ -1,5 +1,41 @@
 [
   {
+    "name": "marpat_woodland",
+    "colors": [
+      "#5a6b3c",
+      "#d4c5a7",
+      "#4a3f2a",
+      "#2d362a"
+    ]
+  },
+  {
+    "name": "marpat_desert",
+    "colors": [
+      "#a0956c",
+      "#dbc4a0",
+      "#8c7853",
+      "#5d4e37"
+    ]
+  },
+  {
+    "name": "marpat_urban",
+    "colors": [
+      "#9fa0a5",
+      "#d8d8d8",
+      "#5a5b5e",
+      "#404143"
+    ]
+  },
+  {
+    "name": "marpat_snow",
+    "colors": [
+      "#e8e6e1",
+      "#c7c5c0",
+      "#8b8985",
+      "#4a4946"
+    ]
+  },
+  {
     "name": "desert_dunes",
     "colors": [
       "#937e5e",

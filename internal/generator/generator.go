@@ -53,6 +53,8 @@ func GeneratePattern(ctx context.Context, cfg *config.Config, camo config.CamoCo
 
 	var gen Generator
 	switch cfg.PatternType {
+	case "pat5":
+		gen = &Pat5Generator{}
 	case "pat4":
 		gen = &Pat4Generator{}
 	case "pat3":

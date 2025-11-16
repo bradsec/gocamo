@@ -58,7 +58,7 @@ func run(cfg *config.Config) error {
 		if len(imagePaths) == 0 {
 			return fmt.Errorf("no image files found in directory: %s", cfg.ImageDir)
 		}
-	case "pat1", "pat2", "pat3", "pat4":
+	case "pat1", "pat2", "pat3", "pat4", "pat5":
 		if cfg.ColorsString != "" {
 			colors := strings.Split(cfg.ColorsString, ",")
 			camoList = append(camoList, config.CamoColors{Name: "custom", Colors: colors})
@@ -99,7 +99,7 @@ func run(cfg *config.Config) error {
 			return fmt.Errorf("no input specified. Use -c for colors, -j for JSON file, or -i for image directory")
 		}
 	default:
-		return fmt.Errorf("invalid pattern type: %s (must be 'pat1', 'pat2', 'pat3', 'pat4', 'all', or 'image')", cfg.PatternType)
+		return fmt.Errorf("invalid pattern type: %s (must be 'pat1', 'pat2', 'pat3', 'pat4', 'pat5', 'all', or 'image')", cfg.PatternType)
 	}
 
 	// Print configuration information
@@ -116,7 +116,7 @@ func run(cfg *config.Config) error {
 	// Set up worker pools and channels
 	var totalJobs int
 	if cfg.PatternType == "all" {
-		totalJobs = len(camoList) * 4 // 4 pattern types for each color palette
+		totalJobs = len(camoList) * 5 // 5 pattern types for each color palette
 	} else {
 		totalJobs = max(len(camoList), len(imagePaths))
 	}
@@ -146,8 +146,8 @@ func run(cfg *config.Config) error {
 			}
 		}
 	} else if cfg.PatternType == "all" {
-		// Generate all 4 pattern types for each color palette
-		patternTypes := []string{"pat1", "pat2", "pat3", "pat4"}
+		// Generate all 5 pattern types for each color palette
+		patternTypes := []string{"pat1", "pat2", "pat3", "pat4", "pat5"}
 		jobIndex := 0
 		for _, camo := range camoList {
 			for _, patType := range patternTypes {
