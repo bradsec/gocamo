@@ -82,22 +82,6 @@ func (pg *Pat2Generator) Generate(ctx context.Context, cfg *config.Config, color
 	return img, nil
 }
 
-// findLightestColor finds the lightest color to use as background
-func (pg *Pat2Generator) findLightestColor(colors []color.RGBA) int {
-	maxBrightness := 0
-	lightestIndex := 0
-
-	for i, c := range colors {
-		brightness := int(c.R) + int(c.G) + int(c.B)
-		if brightness > maxBrightness {
-			maxBrightness = brightness
-			lightestIndex = i
-		}
-	}
-
-	return lightestIndex
-}
-
 // generateLargeScaleBlobs creates major organic blobs with directional bias like MultiCam/OCP
 func (pg *Pat2Generator) generateLargeScaleBlobs(grid [][]int, gridWidth, gridHeight int, colors []color.RGBA, cfg *config.Config) {
 	numBlobs := (gridWidth * gridHeight) / 120 // Slightly more blobs for better coverage
@@ -210,26 +194,6 @@ func (pg *Pat2Generator) drawOrganicBlob(grid [][]int, centerX, centerY, size, c
 	}
 }
 
-// drawAngularElement creates slightly angular shapes (inspired by digital camo)
-func (pg *Pat2Generator) drawAngularElement(grid [][]int, centerX, centerY, size, colorIndex, gridWidth, gridHeight int) {
-	// Create angular but not perfectly geometric shapes
-	for dy := -size; dy <= size; dy++ {
-		for dx := -size; dx <= size; dx++ {
-			x := centerX + dx
-			y := centerY + dy
-
-			if x >= 0 && x < gridWidth && y >= 0 && y < gridHeight {
-				// Angular distance calculation
-				distance := math.Max(math.Abs(float64(dx)), math.Abs(float64(dy)))
-
-				if distance <= float64(size) && rand.Float64() < 0.8 {
-					grid[y][x] = colorIndex
-				}
-			}
-		}
-	}
-}
-
 // drawFractalElement creates small self-similar patterns
 func (pg *Pat2Generator) drawFractalElement(grid [][]int, centerX, centerY, size, colorIndex, gridWidth, gridHeight int) {
 	// Create L-shaped or T-shaped elements like in MARPAT
@@ -251,27 +215,9 @@ func (pg *Pat2Generator) drawFractalElement(grid [][]int, centerX, centerY, size
 	}
 }
 
-// selectDarkerColor selects a darker color from the palette
-func (pg *Pat2Generator) selectDarkerColor(colors []color.RGBA) int {
-	darkestIndex := 0
-	minBrightness := 999999
-
-	for i, c := range colors {
-		brightness := int(c.R) + int(c.G) + int(c.B)
-		if brightness < minBrightness {
-			minBrightness = brightness
-			darkestIndex = i
-		}
-	}
-
-	return darkestIndex
-}
-
-// simpleNoise generates simple noise for organic shapes
+// simpleNoise returns spatially-coherent noise in approximately [-0.5, 0.5].
 func (pg *Pat2Generator) simpleNoise(x, y float64) float64 {
-	// Simple pseudo-Perlin noise
-	n := math.Sin(x*12.9898+y*78.233) * 43758.5453
-	return n - math.Floor(n) - 0.5
+	return perlinNoise(x, y) * 0.5
 }
 
 // drawEllipticalBlob creates horizontally-biased organic shapes like OCP with enhanced natural variation
