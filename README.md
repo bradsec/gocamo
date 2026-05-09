@@ -209,6 +209,12 @@ go build -o gocamo ./cmd/gocamo
    gocamo -c "#ffffff,#012169,#e4002b" -noise -edge
    ```
 
+10. Use the milspec color ratio preset (optimized for 4-color MARPAT patterns):
+    ```
+    gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -r milspec -w 900 -h 900
+    ```
+    The `milspec` preset applies military-standard color ratios optimized for MARPAT camouflage patterns with 4, 3, or 2 colors.
+
 ## Paths
 
 - New patterns will save to output directory (default is output)
