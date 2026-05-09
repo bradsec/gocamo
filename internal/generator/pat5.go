@@ -100,8 +100,14 @@ func (pg *Pat5Generator) Generate(ctx context.Context, cfg *config.Config, color
 		grid[y] = make([]int, gridWidth)
 	}
 
+	// When the user has not specified explicit ratios, use authentic MARPAT distribution.
+	ratios := cfg.ColorRatios
+	if cfg.RatiosString == "" {
+		ratios = pg.getMARPATColorRatios(len(colors))
+	}
+
 	// Layer 1: Initialize with MARPAT digital pixel foundation
-	pg.initializeDigitalPixelBase(grid, gridWidth, gridHeight, colors, cfg.ColorRatios)
+	pg.initializeDigitalPixelBase(grid, gridWidth, gridHeight, colors, ratios)
 
 	// Layer 2: Apply multi-scale digital pixel clustering (like authentic MARPAT)
 	pg.applyMARPATPixelClustering(grid, gridWidth, gridHeight, len(colors))

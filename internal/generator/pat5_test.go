@@ -300,3 +300,66 @@ func TestPat5Generator_EdgeCases(t *testing.T) {
 		})
 	}
 }
+
+func TestPat5Generator_DefaultMARPATRatios(t *testing.T) {
+	// When no explicit ratios are set (RatiosString == ""), pat5 must use MARPAT
+	// ratios internally, so colour 0 (the base) dominates.
+	ctx := context.Background()
+	cfg := &config.Config{
+		Width:         200,
+		Height:        200,
+		BasePixelSize: 4,
+		PatternType:   "pat5",
+		RatiosString:  "",
+		ColorRatios:   []float64{0.25, 0.25, 0.25, 0.25}, // equal — set by SetColorRatios default
+	}
+
+	colors := []color.RGBA{
+		{R: 90, G: 107, B: 60, A: 255},   // index 0 — base green (should dominate ~45%)
+		{R: 212, G: 197, B: 167, A: 255}, // index 1 — tan
+		{R: 74, G: 63, B: 42, A: 255},    // index 2 — brown
+		{R: 45, G: 54, B: 42, A: 255},    // index 3 — dark green (accent ~10%)
+	}
+
+	gen := &Pat5Generator{}
+	img, err := gen.Generate(ctx, cfg, colors)
+	if err != nil {
+		t.Fatalf("Generate failed: %v", err)
+	}
+	if img == nil {
+		t.Fatal("Generate returned nil image")
+	}
+
+	// Count colour pixels in the output
+	bounds := img.Bounds()
+	counts := make([]int, len(colors))
+	total := 0
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			px := img.At(x, y)
+			r, g, b, _ := px.RGBA()
+			rr, gg, bb := uint8(r>>8), uint8(g>>8), uint8(b>>8)
+			for i, c := range colors {
+				if c.R == rr && c.G == gg && c.B == bb {
+					counts[i]++
+					total++
+					break
+				}
+			}
+		}
+	}
+
+	if total == 0 {
+		t.Skip("No exact colour matches found (blending may be active)")
+	}
+
+	baseRatio := float64(counts[0]) / float64(total)
+	accentRatio := float64(counts[3]) / float64(total)
+
+	// Base colour should be significantly more prominent than accent colour.
+	// With equal ratios both would be ~25%; with MARPAT ratios base ~45%, accent ~10%.
+	if baseRatio <= accentRatio*1.5 {
+		t.Errorf("Base colour ratio %f is not sufficiently dominant over accent %f — MARPAT ratios may not be applied",
+			baseRatio, accentRatio)
+	}
+}
