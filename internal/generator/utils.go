@@ -206,3 +206,53 @@ func selectWeightedColorExcluding(ratios []float64, excludeIndices []int, maxCol
 	selectedIndex := selectWeightedColor(adjustedRatios, len(adjustedRatios))
 	return indexMap[selectedIndex]
 }
+
+// noiseHash returns a pseudo-random float in [-1, 1] for integer grid coordinates.
+func noiseHash(x, y int) float64 {
+	n := x + y*57
+	n = (n << 13) ^ n
+	return 1.0 - float64((n*(n*n*15731+789221)+1376312589)&0x7fffffff)/1073741824.0
+}
+
+// lerp linearly interpolates between a and b by t ∈ [0,1].
+func lerp(a, b, t float64) float64 {
+	return a + t*(b-a)
+}
+
+// perlinNoise returns a smoothed noise value in approximately [-1, 1] for (x, y).
+func perlinNoise(x, y float64) float64 {
+	xi := int(x) & 255
+	yi := int(y) & 255
+	xf := x - float64(int(x))
+	yf := y - float64(int(y))
+
+	// Smoothstep fade
+	u := xf * xf * (3.0 - 2.0*xf)
+	v := yf * yf * (3.0 - 2.0*yf)
+
+	aa := noiseHash(xi, yi)
+	ab := noiseHash(xi, yi+1)
+	ba := noiseHash(xi+1, yi)
+	bb := noiseHash(xi+1, yi+1)
+
+	x1 := lerp(aa, ba, u)
+	x2 := lerp(ab, bb, u)
+	return lerp(x1, x2, v)
+}
+
+// fractalNoise combines octaves of Perlin noise (fBm) and returns a value in [0, 1].
+func fractalNoise(x, y float64, octaves int) float64 {
+	noise := 0.0
+	amplitude := 1.0
+	frequency := 1.0
+	maxValue := 0.0
+
+	for i := 0; i < octaves; i++ {
+		noise += perlinNoise(x*frequency, y*frequency) * amplitude
+		maxValue += amplitude
+		amplitude *= 0.5
+		frequency *= 2.0
+	}
+
+	return (noise/maxValue + 1.0) / 2.0
+}
