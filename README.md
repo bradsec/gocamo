@@ -73,14 +73,6 @@ gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -w 900 -h 900
 
 ![Sample Images](samples/gocamo_004_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat5_w900x900.png)
 
-With `-r milspec` (explicit milspec ratios — identical to pat5 default, useful when combining with other patterns via `-t all`):
-
-```terminal
-gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -r milspec -w 900 -h 900
-```
-
-![Sample Images](samples/gocamo_000_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat5_milspec_w900x900.png)
-
 ### all (set using `-t all`)
 The all option generates patterns using all five pattern types (pat1, pat2, pat3, pat4, pat5) for each color palette provided. This is useful when you want to see all pattern variations for comparison or when generating a complete set of patterns from the same color scheme.
 
@@ -94,6 +86,36 @@ When using `-t all`, the tool will generate 5 patterns for each color palette:
 - One pattern using pat3 algorithm
 - One pattern using pat4 algorithm
 - One pattern using pat5 algorithm
+
+## Base Pixel Size (`-b`)
+
+The `-b` flag controls the size of the individual pixel blocks that build up the pattern. Lower values produce finer, more detailed patterns; higher values produce coarser, more blocky patterns. All pattern types scale together — use `-b` to match the pattern granularity to your output resolution or intended use.
+
+`-b 4` (default — fine detail)
+
+```terminal
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat1 -b 4 -w 600 -h 400
+```
+
+![Sample b=4](samples/pat1_b4_w600x400.png)
+
+`-b 8` (medium grain)
+
+```terminal
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat1 -b 8 -w 600 -h 400
+```
+
+![Sample b=8](samples/pat1_b8_w600x400.png)
+
+`-b 16` (coarse / large block)
+
+```terminal
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat1 -b 16 -w 600 -h 400
+```
+
+![Sample b=16](samples/pat1_b16_w600x400.png)
+
+---
 
 ### image (set using `-t image`, uses images in the `input` directory as reference)
 The ImageGenerator processes an input image to create a camouflage-like pattern based on the original image's colors and features. Loads the input image and resizes it to the target dimensions while maintaining aspect ratio. Applies max pooling to reduce the image size and enhance prominent features. Applies a Laplacian filter to enhance edges and details in the image. Uses k-means clustering to extract the main colors from the processed image. Maps each pixel in the processed image to the closest main color.
@@ -222,11 +244,11 @@ go build -o gocamo ./cmd/gocamo
    gocamo -c "#ffffff,#012169,#e4002b" -noise -edge
    ```
 
-10. Use the milspec color ratio preset (optimized for 4-color MARPAT patterns):
+10. Apply milspec colour ratios (45/30/15/10%) to all pattern types:
     ```
-    gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -r milspec -w 900 -h 900
+    gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t all -r milspec -w 900 -h 900
     ```
-    The `milspec` preset applies military-standard color ratios optimized for MARPAT camouflage patterns with 4, 3, or 2 colors.
+    The `milspec` preset sets asymmetric colour coverage modelled on real military patterns — the first colour dominates at 45%, giving the base tone visual weight. Note: pat5 already uses these ratios by default; `-r milspec` is most visible on pat1, pat2, pat3, and pat4.
 
 ## Paths
 
