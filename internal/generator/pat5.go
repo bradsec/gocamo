@@ -84,44 +84,41 @@ type Pixel struct {
 
 // Generate creates a pat5-style MARPAT-inspired camouflage pattern using fractal-based
 // grid generation for authentic digital camouflage with 100% coverage.
+// Generate creates a MARPAT-inspired digital camouflage pattern using a 5-layer pipeline:
+// IFS fractal macro structure → weighted colour grid → rectangle clustering → digital pixels → texture noise.
 func (pg *Pat5Generator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
-	// Use the centralized pixel size adjustment for perfect fit
 	adjustedBasePixelSize := cfg.AdjustBasePixelSize()
 
 	img := image.NewNRGBA(image.Rect(0, 0, cfg.Width, cfg.Height))
-
-	// Calculate grid dimensions for complete coverage
 	gridWidth := cfg.Width / adjustedBasePixelSize
 	gridHeight := cfg.Height / adjustedBasePixelSize
 
-	// Create complete pixel grid (like other successful patterns)
-	grid := make([][]int, gridHeight)
-	for y := range grid {
-		grid[y] = make([]int, gridWidth)
-	}
-
-	// When the user has not specified explicit ratios, use authentic MARPAT distribution.
+	// Use MARPAT ratios when the user has not specified explicit ratios.
 	ratios := cfg.ColorRatios
 	if cfg.RatiosString == "" {
 		ratios = pg.getMARPATColorRatios(len(colors))
 	}
 
-	// Layer 1: Initialize with MARPAT digital pixel foundation
-	pg.initializeDigitalPixelBase(grid, gridWidth, gridHeight, colors, ratios)
+	// Layer 1: IFS fractal — large-scale macro colour structure (sparse hint layer).
+	fractalLayer := pg.generateFractalLayer(gridWidth, gridHeight, colors)
 
-	// Layer 2: Apply multi-scale digital pixel clustering (like authentic MARPAT)
+	// Layer 2: MARPAT-weighted colour grid — base distribution.
+	grid := pg.initializeMARPATGrid(gridWidth, gridHeight, ratios, len(colors))
+
+	// Layer 3: Rectangle clustering — mid-scale rectangular pixel groups guided by fractal.
+	pg.applyRectangleClustering(grid, fractalLayer, gridWidth, gridHeight, adjustedBasePixelSize)
+
+	// Layer 4: Digital pixel clustering — small 1×2/2×1/2×2 digital blocks.
 	pg.applyMARPATPixelClustering(grid, gridWidth, gridHeight, len(colors))
 
-	// Layer 3: Add small-scale digital texture and noise
+	// Layer 5: Fine texture noise — 5% single-pixel variation.
 	pg.addDigitalTextureNoise(grid, gridWidth, gridHeight, len(colors))
 
-	// Render the complete grid with 100% coverage
 	pg.renderGrid(img, grid, colors, adjustedBasePixelSize)
 
 	if cfg.AddNoise {
 		addNoiseNRGBA(img, colors)
 	}
-
 	if cfg.AddEdge {
 		addEdgeDetailsNRGBA(img, adjustedBasePixelSize)
 	}
