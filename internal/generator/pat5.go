@@ -10,34 +10,19 @@ import (
 	"github.com/bradsec/gocamo/pkg/config"
 )
 
-// Pat5Generator creates pat5 (MARPAT-inspired) camouflage patterns using fractal algorithms
-// and rectangular template systems. It generates digital patterns with variable rectangle sizes
-// and unequal color distribution matching authentic MARPAT characteristics.
+// Pat5Generator creates pat5 digital camouflage patterns.
+// Uses 45/30/15/10 colour ratios and a Voronoi-seed approach
+// to produce consistent rectangular digital-pixel clusters at the correct scale.
 type Pat5Generator struct{}
 
-// FractalParams holds parameters for Iterative Function System (IFS) generation
-type FractalParams struct {
-	ScaleX    float64
-	ScaleY    float64
-	RotAngle  float64
-	TransX    float64
-	TransY    float64
-	ColorIdx  int
-	Prob      float64
+// seed is a Voronoi seed point with a colour index.
+type seed struct {
+	x, y  int
+	color int
 }
 
-// RectangleCluster represents a rectangular cluster with separate width and height
-type RectangleCluster struct {
-	Width       int
-	Height      int
-	ClusterType string  // "full", "horizontal", "quarter", "vertical", "strip"
-	Probability float64 // Weighted probability for selection
-}
-
-// Generate creates a pat5-style MARPAT-inspired camouflage pattern using fractal-based
-// grid generation for authentic digital camouflage with 100% coverage.
-// Generate creates a MARPAT-inspired digital camouflage pattern using a 5-layer pipeline:
-// IFS fractal macro structure → weighted colour grid → rectangle clustering → digital pixels → texture noise.
+// Generate creates a pat5 digital camouflage pattern.
+// Pipeline: Voronoi seeding → directional CA for rectangular shaping → pixel blocks → ratio enforcement.
 func (pg *Pat5Generator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
 	adjustedBasePixelSize := cfg.AdjustBasePixelSize()
 
@@ -45,26 +30,26 @@ func (pg *Pat5Generator) Generate(ctx context.Context, cfg *config.Config, color
 	gridWidth := cfg.Width / adjustedBasePixelSize
 	gridHeight := cfg.Height / adjustedBasePixelSize
 
-	// Use MARPAT ratios when the user has not specified explicit ratios.
+	// Use pat5 default ratios when the user has not specified explicit ratios.
 	ratios := cfg.ColorRatios
 	if cfg.RatiosString == "" {
-		ratios = pg.getMARPATColorRatios(len(colors))
+		ratios = pg.getPat5DefaultColorRatios(len(colors))
 	}
 
-	// Layer 1: IFS fractal — large-scale macro colour structure (sparse hint layer).
-	fractalLayer := pg.generateFractalLayer(gridWidth, gridHeight, colors)
+	// Layer 1: Voronoi seeding — scatter weighted seeds and grow Voronoi regions.
+	grid := pg.generateVoronoiGrid(gridWidth, gridHeight, ratios, len(colors))
 
-	// Layer 2: MARPAT-weighted colour grid — base distribution.
-	grid := pg.initializeMARPATGrid(gridWidth, gridHeight, ratios, len(colors))
+	// Layer 2: Directional CA — reshape diagonal Voronoi boundaries into axis-aligned
+	// rectangles characteristic of digital camouflage pixels.
+	pg.applyRectangularCA(grid, gridWidth, gridHeight, 3, 1, 2) // horizontal
+	pg.applyRectangularCA(grid, gridWidth, gridHeight, 1, 3, 2) // vertical
 
-	// Layer 3: Rectangle clustering — mid-scale rectangular pixel groups guided by fractal.
-	pg.applyRectangleClustering(grid, fractalLayer, gridWidth, gridHeight, adjustedBasePixelSize)
+	// Layer 3: Small digital pixel blocks for fine texture.
+	pg.applyDigitalPixelBlocks(grid, gridWidth, gridHeight)
 
-	// Layer 4: Digital pixel clustering — small 1×2/2×1/2×2 digital blocks.
-	pg.applyMARPATPixelClustering(grid, gridWidth, gridHeight, len(colors))
-
-	// Layer 5: Fine texture noise — 5% single-pixel variation.
-	pg.addDigitalTextureNoise(grid, gridWidth, gridHeight, len(colors))
+	// Layer 4: Restore target colour ratios that CA majority-voting may have eroded.
+	// Places proper-sized rectangular patches so corrections match the pat5 style.
+	pg.enforceColorRatios(grid, gridWidth, gridHeight, ratios, len(colors))
 
 	pg.renderGrid(img, grid, colors, adjustedBasePixelSize)
 
@@ -78,105 +63,142 @@ func (pg *Pat5Generator) Generate(ctx context.Context, cfg *config.Config, color
 	return img, nil
 }
 
-// applyMARPATPixelClustering creates MARPAT-style digital pixel clusters
-func (pg *Pat5Generator) applyMARPATPixelClustering(grid [][]int, width, height, numColors int) {
-	// Apply multiple passes of small-scale digital clustering
-	for pass := 0; pass < 2; pass++ {
-		// Create small rectangular pixel blocks (1x2, 2x1, 2x2)
-		for y := 0; y < height-1; y += 1 {
-			for x := 0; x < width-1; x += 1 {
-				// Randomly choose to create a digital pixel block
-				if rand.Float64() < 0.4 { // 40% chance to create block
-					blockType := rand.Intn(3)
-					baseColor := grid[y][x]
+// generateVoronoiGrid places weighted seed points using grid-jitter sampling
+// (one seed per regular jitter cell, with random offset within the cell). This guarantees
+// a minimum seed spacing of ~jitterSize cells, preventing tiny isolated Voronoi regions
+// that would appear as single-pixel dots in the output.
+func (pg *Pat5Generator) generateVoronoiGrid(width, height int, ratios []float64, numColors int) [][]int {
+	grid := make([][]int, height)
+	for i := range grid {
+		grid[i] = make([]int, width)
+	}
 
-					switch blockType {
-					case 0: // 2x1 horizontal rectangle
-						if x+1 < width {
-							grid[y][x+1] = baseColor
+	// Keep seed spacing in grid cells so BasePixelSize scales pat5 the same way
+	// it scales the other pattern generators.
+	jitterSize := 4
+	if width < jitterSize || height < jitterSize {
+		jitterSize = width
+		if height < jitterSize {
+			jitterSize = height
+		}
+	}
+
+	var seeds []seed
+	cols := (width + jitterSize - 1) / jitterSize
+	rows := (height + jitterSize - 1) / jitterSize
+
+	for gy := 0; gy < rows; gy++ {
+		for gx := 0; gx < cols; gx++ {
+			x0 := gx * jitterSize
+			y0 := gy * jitterSize
+			x1 := x0 + jitterSize
+			y1 := y0 + jitterSize
+			if x1 > width {
+				x1 = width
+			}
+			if y1 > height {
+				y1 = height
+			}
+
+			sx := x0 + rand.Intn(x1-x0)
+			sy := y0 + rand.Intn(y1-y0)
+			seeds = append(seeds, seed{
+				x:     sx,
+				y:     sy,
+				color: selectWeightedColor(ratios, numColors),
+			})
+		}
+	}
+
+	// Assign each cell the nearest seed's colour (Euclidean distance).
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			minDist := math.MaxFloat64
+			best := 0
+			for _, s := range seeds {
+				dx := float64(x - s.x)
+				dy := float64(y - s.y)
+				d := dx*dx + dy*dy
+				if d < minDist {
+					minDist = d
+					best = s.color
+				}
+			}
+			grid[y][x] = best
+		}
+	}
+
+	return grid
+}
+
+// applyRectangularCA performs cellular automata with a rectangular neighbourhood.
+// Directional passes (3×1 horizontal, 1×3 vertical) snap Voronoi boundaries to
+// axis-aligned edges, giving the pattern its characteristic rectangular pixel look.
+func (pg *Pat5Generator) applyRectangularCA(grid [][]int, width, height, winW, winH, iterations int) {
+	halfW := winW / 2
+	halfH := winH / 2
+
+	for iter := 0; iter < iterations; iter++ {
+		newGrid := make([][]int, height)
+		for y := range newGrid {
+			newGrid[y] = make([]int, width)
+			copy(newGrid[y], grid[y])
+		}
+
+		for y := 0; y < height; y++ {
+			for x := 0; x < width; x++ {
+				colorCounts := make(map[int]int)
+
+				for dy := -halfH; dy <= halfH; dy++ {
+					ny := y + dy
+					if ny < 0 || ny >= height {
+						continue
+					}
+					for dx := -halfW; dx <= halfW; dx++ {
+						nx := x + dx
+						if nx < 0 || nx >= width {
+							continue
 						}
-					case 1: // 1x2 vertical rectangle
-						if y+1 < height {
-							grid[y+1][x] = baseColor
-						}
-					case 2: // 2x2 square block
-						if x+1 < width && y+1 < height {
-							grid[y][x+1] = baseColor
-							grid[y+1][x] = baseColor
-							grid[y+1][x+1] = baseColor
-						}
+						colorCounts[grid[ny][nx]]++
 					}
 				}
+
+				dominant := grid[y][x]
+				maxCount := 0
+				for c, count := range colorCounts {
+					if count > maxCount {
+						maxCount = count
+						dominant = c
+					}
+				}
+
+				newGrid[y][x] = dominant
 			}
 		}
 
-		// Apply light cellular automata for clustering (preserve digital appearance)
-		pg.applyLightCellularAutomata(grid, width, height, numColors)
-	}
-}
-
-// applyLightCellularAutomata applies minimal cellular automata to maintain digital pixels
-func (pg *Pat5Generator) applyLightCellularAutomata(grid [][]int, width, height, numColors int) {
-	newGrid := make([][]int, height)
-	for y := range newGrid {
-		newGrid[y] = make([]int, width)
-	}
-
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			// Count immediate neighbors (cross pattern only for sharper digital edges)
-			colorCounts := make(map[int]int)
-			neighbors := 0
-
-			// Check only 4-connected neighbors (not 8) for sharper digital appearance
-			directions := [][]int{{0, -1}, {-1, 0}, {1, 0}, {0, 1}}
-			for _, dir := range directions {
-				nx := x + dir[0]
-				ny := y + dir[1]
-				if nx >= 0 && nx < width && ny >= 0 && ny < height {
-					colorCounts[grid[ny][nx]]++
-					neighbors++
-				}
-			}
-			colorCounts[grid[y][x]]++ // Include self
-			neighbors++
-
-			// Find dominant color
-			dominantColor := grid[y][x]
-			maxCount := 0
-			for color, count := range colorCounts {
-				if count > maxCount {
-					maxCount = count
-					dominantColor = color
-				}
-			}
-
-			// Apply very light clustering (preserve digital sharpness)
-			if maxCount >= 3 && rand.Float64() < 0.3 { // Light clustering
-				newGrid[y][x] = dominantColor
-			} else {
-				newGrid[y][x] = grid[y][x] // Keep original
-			}
-		}
-	}
-
-	// Copy back
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			grid[y][x] = newGrid[y][x]
+		for y := 0; y < height; y++ {
+			copy(grid[y], newGrid[y])
 		}
 	}
 }
 
-// addDigitalTextureNoise adds fine-scale digital texture
-func (pg *Pat5Generator) addDigitalTextureNoise(grid [][]int, width, height, numColors int) {
-	// Add random single-pixel noise for authentic digital texture
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			// 5% chance to randomly change pixel (creates digital texture)
-			if rand.Float64() < 0.05 {
-				// Choose a different color from available colors
-				grid[y][x] = rand.Intn(numColors)
+// applyDigitalPixelBlocks adds fine-scale 2×1, 1×2, and 2×2 pixel blocks
+// that give the pattern its characteristic digital/pixelated texture.
+func (pg *Pat5Generator) applyDigitalPixelBlocks(grid [][]int, width, height int) {
+	for y := 0; y < height-1; y++ {
+		for x := 0; x < width-1; x++ {
+			if rand.Float64() < 0.25 {
+				base := grid[y][x]
+				switch rand.Intn(3) {
+				case 0:
+					grid[y][x+1] = base
+				case 1:
+					grid[y+1][x] = base
+				case 2:
+					grid[y][x+1] = base
+					grid[y+1][x] = base
+					grid[y+1][x+1] = base
+				}
 			}
 		}
 	}
@@ -188,11 +210,9 @@ func (pg *Pat5Generator) renderGrid(img *image.NRGBA, grid [][]int, colors []col
 
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			// Map pixel coordinates to grid coordinates
 			gridX := x / pixelSize
 			gridY := y / pixelSize
 
-			// Ensure we don't go out of bounds
 			if gridY < len(grid) && gridX < len(grid[gridY]) {
 				colorIdx := grid[gridY][gridX]
 				if colorIdx >= 0 && colorIdx < len(colors) {
@@ -203,16 +223,15 @@ func (pg *Pat5Generator) renderGrid(img *image.NRGBA, grid [][]int, colors []col
 	}
 }
 
-func (pg *Pat5Generator) initializeMARPATGrid(width, height int, colorRatios []float64, numColors int) [][]int {
+func (pg *Pat5Generator) initializePat5Grid(width, height int, colorRatios []float64, numColors int) [][]int {
 	grid := make([][]int, height)
 	for i := range grid {
 		grid[i] = make([]int, width)
 	}
 
-	// If no custom ratios, use MARPAT-style distribution
 	ratios := colorRatios
 	if len(ratios) == 0 || len(ratios) != numColors {
-		ratios = pg.getMARPATColorRatios(numColors)
+		ratios = pg.getPat5DefaultColorRatios(numColors)
 	}
 
 	for y := 0; y < height; y++ {
@@ -224,183 +243,95 @@ func (pg *Pat5Generator) initializeMARPATGrid(width, height int, colorRatios []f
 	return grid
 }
 
-// getMARPATColorRatios returns authentic MARPAT color distribution ratios
-func (pg *Pat5Generator) getMARPATColorRatios(numColors int) []float64 {
-	if numColors == 4 {
-		// Authentic 4-color MARPAT distribution
-		return []float64{0.45, 0.30, 0.15, 0.10} // Base, secondary, accent, highlight
-	} else if numColors == 3 {
-		// 3-color adapted distribution
-		return []float64{0.50, 0.35, 0.15}
-	} else {
-		// Equal distribution fallback
-		equal := 1.0 / float64(numColors)
-		ratios := make([]float64, numColors)
-		for i := range ratios {
-			ratios[i] = equal
-		}
-		return ratios
-	}
-}
+// enforceColorRatios corrects colour distribution after CA and pixel-block passes by placing
+// rectangular clusters of under-represented colours into regions of over-represented colours.
+// Runs up to 10 iterations until every colour is within 2% of its target ratio.
+func (pg *Pat5Generator) enforceColorRatios(grid [][]int, width, height int, ratios []float64, numColors int) {
+	total := width * height
 
-// generateFractalLayer creates a fractal noise layer using IFS (Iterative Function System)
-func (pg *Pat5Generator) generateFractalLayer(width, height int, colors []color.RGBA) [][]int {
-	layer := make([][]int, height)
-	for i := range layer {
-		layer[i] = make([]int, width)
-	}
+	for iter := 0; iter < 10; iter++ {
+		counts := pg.countColors(grid, width, height, numColors)
 
-	// Define IFS parameters for fractal generation
-	ifsParams := []FractalParams{
-		{ScaleX: 0.5, ScaleY: 0.5, RotAngle: 0, TransX: 0, TransY: 0, ColorIdx: 0, Prob: 0.25},
-		{ScaleX: 0.5, ScaleY: 0.5, RotAngle: 0, TransX: 0.5, TransY: 0, ColorIdx: 1, Prob: 0.25},
-		{ScaleX: 0.5, ScaleY: 0.5, RotAngle: 0, TransX: 0, TransY: 0.5, ColorIdx: 2, Prob: 0.25},
-		{ScaleX: 0.5, ScaleY: 0.5, RotAngle: math.Pi/4, TransX: 0.5, TransY: 0.5, ColorIdx: 3, Prob: 0.25},
-	}
-
-	// Generate fractal points
-	numPoints := width * height / 4
-	x, y := 0.5, 0.5
-
-	for i := 0; i < numPoints; i++ {
-		// Select random IFS transformation
-		r := rand.Float64()
-		var param FractalParams
-		cumProb := 0.0
-		for _, p := range ifsParams {
-			cumProb += p.Prob
-			if r <= cumProb {
-				param = p
+		// Check whether every colour is within tolerance.
+		allOK := true
+		for i := 0; i < numColors; i++ {
+			if math.Abs(float64(counts[i])/float64(total)-ratios[i]) > 0.02 {
+				allOK = false
 				break
 			}
 		}
-
-		// Apply fractal transformation
-		newX := param.ScaleX*math.Cos(param.RotAngle)*x - param.ScaleY*math.Sin(param.RotAngle)*y + param.TransX
-		newY := param.ScaleX*math.Sin(param.RotAngle)*x + param.ScaleY*math.Cos(param.RotAngle)*y + param.TransY
-
-		// Map to grid coordinates
-		gridX := int(newX * float64(width))
-		gridY := int(newY * float64(height))
-
-		if gridX >= 0 && gridX < width && gridY >= 0 && gridY < height {
-			layer[gridY][gridX] = param.ColorIdx % len(colors)
+		if allOK {
+			break
 		}
 
-		x, y = newX, newY
-	}
-
-	return layer
-}
-
-// createRectangleClusters defines MARPAT-style rectangle variations with weighted probabilities
-func (pg *Pat5Generator) createRectangleClusters() []RectangleCluster {
-	return []RectangleCluster{
-		// Full blocks — main pattern base
-		{Width: 10, Height: 10, ClusterType: "full", Probability: 0.25},
-		{Width: 14, Height: 14, ClusterType: "full", Probability: 0.15},
-
-		// Horizontal rectangles — MARPAT characteristic
-		{Width: 14, Height: 6, ClusterType: "horizontal", Probability: 0.12},
-		{Width: 18, Height: 4, ClusterType: "horizontal", Probability: 0.10},
-		{Width: 10, Height: 4, ClusterType: "horizontal", Probability: 0.08},
-
-		// Quarter blocks — detail areas
-		{Width: 5, Height: 5, ClusterType: "quarter", Probability: 0.12},
-		{Width: 7, Height: 7, ClusterType: "quarter", Probability: 0.08},
-
-		// Vertical rectangles — variation
-		{Width: 4, Height: 14, ClusterType: "vertical", Probability: 0.05},
-		{Width: 6, Height: 10, ClusterType: "vertical", Probability: 0.05},
-	}
-}
-
-// selectWeightedRectangle selects a rectangle cluster based on weighted probabilities
-func (pg *Pat5Generator) selectWeightedRectangle(clusters []RectangleCluster) RectangleCluster {
-	r := rand.Float64()
-	cumulative := 0.0
-
-	for _, cluster := range clusters {
-		cumulative += cluster.Probability
-		if r <= cumulative {
-			return cluster
+		// Identify the most under-represented and most over-represented colours.
+		underColor, overColor := -1, -1
+		maxDeficit, maxExcess := 0.0, 0.0
+		for i := 0; i < numColors; i++ {
+			actual := float64(counts[i]) / float64(total)
+			if d := ratios[i] - actual; d > maxDeficit {
+				maxDeficit = d
+				underColor = i
+			}
+			if e := actual - ratios[i]; e > maxExcess {
+				maxExcess = e
+				overColor = i
+			}
 		}
-	}
-
-	// Fallback to first cluster
-	return clusters[0]
-}
-
-// applyRectangleClustering creates variable-sized rectangular clusters with MARPAT-style variation
-func (pg *Pat5Generator) applyRectangleClustering(grid, fractalLayer [][]int, width, height, basePixelSize int) {
-	rectangleClusters := pg.createRectangleClusters()
-	attempts := (width * height) / 30 // Slightly more attempts for better coverage
-
-	for attempt := 0; attempt < attempts; attempt++ {
-		cluster := pg.selectWeightedRectangle(rectangleClusters)
-
-		// Ensure cluster fits within grid bounds
-		if cluster.Width >= width || cluster.Height >= height {
-			continue
+		if underColor < 0 || overColor < 0 {
+			break
 		}
 
-		startY := rand.Intn(height - cluster.Height + 1)
-		startX := rand.Intn(width - cluster.Width + 1)
+		// Place rectangular patches of underColor inside overColor territory.
+		// Patch size (3–7 wide, 2–5 tall grid cells) mirrors the pat5 cluster scale.
+		targetPixels := int(maxDeficit * float64(total))
+		placed := 0
+		maxAttempts := total * 4
 
-		// Choose color from fractal layer or dominant surrounding color
-		var colorIdx int
-		if rand.Float64() < 0.4 {
-			centerY := startY + cluster.Height/2
-			centerX := startX + cluster.Width/2
-			colorIdx = fractalLayer[centerY][centerX]
-		} else {
-			colorIdx = pg.getDominantColor(grid, startX, startY, cluster.Width, cluster.Height)
-		}
-
-		// Apply rectangular cluster with varied fill probability based on cluster type
-		fillProb := 0.8 // Default fill probability
-		switch cluster.ClusterType {
-		case "full":
-			fillProb = 0.9 // Full blocks more solid
-		case "horizontal", "vertical":
-			fillProb = 0.85 // Rectangles moderately solid
-		case "quarter":
-			fillProb = 0.75 // Quarter blocks more fragmented
-		}
-
-		for dy := 0; dy < cluster.Height; dy++ {
-			for dx := 0; dx < cluster.Width; dx++ {
-				if rand.Float64() < fillProb {
-					grid[startY+dy][startX+dx] = colorIdx
+		for attempt := 0; attempt < maxAttempts && placed < targetPixels; attempt++ {
+			x := rand.Intn(width)
+			y := rand.Intn(height)
+			if grid[y][x] != overColor {
+				continue
+			}
+			w := 3 + rand.Intn(5) // 3–7 cells wide
+			h := 2 + rand.Intn(4) // 2–5 cells tall
+			for dy := 0; dy < h && y+dy < height; dy++ {
+				for dx := 0; dx < w && x+dx < width; dx++ {
+					if grid[y+dy][x+dx] == overColor {
+						grid[y+dy][x+dx] = underColor
+						placed++
+					}
 				}
 			}
 		}
 	}
 }
 
-// getDominantColor finds the most common color in a rectangular region
-func (pg *Pat5Generator) getDominantColor(grid [][]int, startX, startY, width, height int) int {
-	colorCount := make(map[int]int)
-	gridHeight, gridWidth := len(grid), len(grid[0])
-
-	for dy := 0; dy < height; dy++ {
-		for dx := 0; dx < width; dx++ {
-			y, x := startY+dy, startX+dx
-			if y < gridHeight && x < gridWidth {
-				colorCount[grid[y][x]]++
+// countColors returns per-colour pixel counts for the grid.
+func (pg *Pat5Generator) countColors(grid [][]int, width, height, numColors int) []int {
+	counts := make([]int, numColors)
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			if c := grid[y][x]; c >= 0 && c < numColors {
+				counts[c]++
 			}
 		}
 	}
-
-	maxCount := 0
-	dominantColor := 0
-	for color, count := range colorCount {
-		if count > maxCount {
-			maxCount = count
-			dominantColor = color
-		}
-	}
-
-	return dominantColor
+	return counts
 }
 
+// getPat5DefaultColorRatios returns pat5's default colour distribution ratios.
+func (pg *Pat5Generator) getPat5DefaultColorRatios(numColors int) []float64 {
+	if numColors == 4 {
+		return []float64{0.45, 0.30, 0.15, 0.10}
+	} else if numColors == 3 {
+		return []float64{0.50, 0.35, 0.15}
+	}
+	equal := 1.0 / float64(numColors)
+	ratios := make([]float64, numColors)
+	for i := range ratios {
+		ratios[i] = equal
+	}
+	return ratios
+}

@@ -29,7 +29,7 @@ The program will produce optimized small PNG file sizes for high-resolution patt
 
 ### pat1 (set using `-t pat1`, default if no type specified)
 
-Woodland-style organic shapes. The lightest colour is automatically used as the background base.
+Layered woodland camouflage with a light base colour, large organic regions, medium branch/foliage-like marks, and small digital details. PAT1 has the most traditional woodland feel: broad natural shapes with some pixel texture, and the lightest palette colour is automatically used as the background base.
 
 ```terminal
 gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat1 -w 900 -h 900
@@ -39,7 +39,7 @@ gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat1 -w 900 -h 900
 
 ### pat2 (set using `-t pat2`)
 
-Blob-based organic camouflage using spatially-coherent Perlin noise for smooth, natural-looking blob edges.
+Dense organic camouflage with multi-scale blobs, directional flow, Perlin-noise edges, and fine speckled detail. PAT2 is the most textured and noisy-looking pattern, useful when you want a busier field with soft natural transitions rather than obvious square blocks.
 
 ```terminal
 gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat2 -w 900 -h 900
@@ -49,6 +49,8 @@ gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat2 -w 900 -h 900
 
 ### pat3 (set using `-t pat3`)
 
+Geometric digital camouflage built from cellular-automata clustering plus larger square and rectangular regions. PAT3 is the most block-oriented pattern: hard edges, clear pixel structure, and visible rectangular groupings.
+
 ```terminal
 gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat3 -w 900 -h 900
 ```
@@ -56,6 +58,8 @@ gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat3 -w 900 -h 900
 ![Sample Images](samples/gocamo_002_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat3_w900x900.png)
 
 ### pat4 (set using `-t pat4`)
+
+Cellular-automata camouflage that starts from weighted random colour placement and smooths it into compact clustered regions. PAT4 sits between PAT2 and PAT3: less speckled than PAT2, less rectangular than PAT3, with rounded organic patches.
 
 ```terminal
 gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat4 -w 900 -h 900
@@ -65,7 +69,7 @@ gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat4 -w 900 -h 900
 
 ### pat5 (set using `-t pat5`)
 
-MARPAT-inspired digital camouflage using a 5-layer pipeline: IFS fractal macro structure → MARPAT-weighted colour grid → rectangle clustering → digital pixel blocks → fine texture noise. Uses authentic MARPAT colour ratios (45/30/15/10%) by default.
+Digital military-style camouflage using weighted Voronoi seeding, directional rectangular cellular-automata shaping, small pixel blocks, and ratio correction. PAT5 is tuned for rectangular micro-clusters and controlled colour coverage, using 45/30/15/10 colour ratios by default when no custom `-r` value is provided.
 
 ```terminal
 gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -w 900 -h 900
@@ -191,7 +195,7 @@ go build -o gocamo ./cmd/gocamo
    # Three color pat3 pattern
    gocamo -c "#ffffff,#012169,#e4002b" -t pat3
 
-   # Generate all 4 pattern types with same colors
+   # Generate all 5 pattern types with same colors
    gocamo -c "#ffffff,#012169,#e4002b" -t all
    ```
 
@@ -312,4 +316,3 @@ When using the `-j` flag to process multiple patterns, you need to provide a JSO
   }
 ]
 ```
-

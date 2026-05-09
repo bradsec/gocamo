@@ -13,7 +13,7 @@ import (
 // Mimics proven military camouflage design principles rather than novel algorithms.
 type Pat1Generator struct{}
 
-// Generate creates woodland camouflage inspired by successful military patterns like MARPAT and MultiCam.
+// Generate creates woodland camouflage inspired by layered military field patterns.
 // Uses the same technical architecture as existing box/blob patterns.
 func (pg *Pat1Generator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
 	// Use the centralized pixel size adjustment for perfect fit
@@ -199,7 +199,6 @@ func (pg *Pat1Generator) applyMilitarySmoothing(grid [][]int, cellWidth, cellHei
 }
 
 // Helper functions for distributed military color selection
-
 
 // Drawing functions for woodland elements
 

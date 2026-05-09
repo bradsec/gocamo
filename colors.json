@@ -1,6 +1,6 @@
 [
   {
-    "name": "marpat_woodland",
+    "name": "woodland",
     "colors": [
       "#5a6b3c",
       "#d4c5a7",
@@ -9,7 +9,7 @@
     ]
   },
   {
-    "name": "marpat_desert",
+    "name": "desert",
     "colors": [
       "#a0956c",
       "#dbc4a0",
@@ -18,7 +18,7 @@
     ]
   },
   {
-    "name": "marpat_urban",
+    "name": "urban",
     "colors": [
       "#9fa0a5",
       "#d8d8d8",
@@ -27,7 +27,7 @@
     ]
   },
   {
-    "name": "marpat_snow",
+    "name": "snow",
     "colors": [
       "#e8e6e1",
       "#c7c5c0",

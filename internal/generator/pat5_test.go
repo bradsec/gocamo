@@ -18,10 +18,10 @@ func TestPat5Generator_Generate(t *testing.T) {
 	}
 
 	colors := []color.RGBA{
-		{R: 70, G: 72, B: 47, A: 255},   // Dark green
-		{R: 109, G: 104, B: 81, A: 255}, // Medium green
+		{R: 70, G: 72, B: 47, A: 255},    // Dark green
+		{R: 109, G: 104, B: 81, A: 255},  // Medium green
 		{R: 155, G: 150, B: 127, A: 255}, // Light green
-		{R: 30, G: 36, B: 21, A: 255},   // Very dark green
+		{R: 30, G: 36, B: 21, A: 255},    // Very dark green
 	}
 
 	gen := &Pat5Generator{}
@@ -42,7 +42,7 @@ func TestPat5Generator_Generate(t *testing.T) {
 	}
 }
 
-func TestPat5Generator_MARPATColorRatios(t *testing.T) {
+func TestPat5Generator_DefaultColorRatios(t *testing.T) {
 	gen := &Pat5Generator{}
 
 	tests := []struct {
@@ -51,7 +51,7 @@ func TestPat5Generator_MARPATColorRatios(t *testing.T) {
 		expected  []float64
 	}{
 		{
-			name:      "4-color MARPAT",
+			name:      "4-color default",
 			numColors: 4,
 			expected:  []float64{0.45, 0.30, 0.15, 0.10},
 		},
@@ -69,7 +69,7 @@ func TestPat5Generator_MARPATColorRatios(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ratios := gen.getMARPATColorRatios(tt.numColors)
+			ratios := gen.getPat5DefaultColorRatios(tt.numColors)
 
 			if len(ratios) != tt.numColors {
 				t.Errorf("Expected %d ratios, got %d", tt.numColors, len(ratios))
@@ -95,12 +95,12 @@ func TestPat5Generator_MARPATColorRatios(t *testing.T) {
 	}
 }
 
-func TestPat5Generator_InitializeMARPATGrid(t *testing.T) {
+func TestPat5Generator_InitializePat5Grid(t *testing.T) {
 	gen := &Pat5Generator{}
 	width, height := 10, 10
 	numColors := 4
 
-	grid := gen.initializeMARPATGrid(width, height, nil, numColors)
+	grid := gen.initializePat5Grid(width, height, nil, numColors)
 
 	if len(grid) != height {
 		t.Errorf("Grid height incorrect: expected %d, got %d", height, len(grid))
@@ -119,57 +119,20 @@ func TestPat5Generator_InitializeMARPATGrid(t *testing.T) {
 	}
 }
 
-func TestPat5Generator_GenerateFractalLayer(t *testing.T) {
+func TestPat5Generator_RectangularCA(t *testing.T) {
 	gen := &Pat5Generator{}
 	width, height := 20, 20
-	colors := []color.RGBA{
-		{R: 255, G: 0, B: 0, A: 255},
-		{R: 0, G: 255, B: 0, A: 255},
-		{R: 0, G: 0, B: 255, A: 255},
-		{R: 255, G: 255, B: 0, A: 255},
-	}
+	numColors := 4
 
-	layer := gen.generateFractalLayer(width, height, colors)
+	grid := gen.initializePat5Grid(width, height, nil, numColors)
+	gen.applyRectangularCA(grid, width, height, 5, 3, 2)
 
-	if len(layer) != height {
-		t.Errorf("Fractal layer height incorrect: expected %d, got %d", height, len(layer))
-	}
-
-	for i, row := range layer {
-		if len(row) != width {
-			t.Errorf("Fractal layer row %d width incorrect: expected %d, got %d", i, width, len(row))
-		}
-
-		for j, colorIdx := range row {
-			if colorIdx < 0 || colorIdx >= len(colors) {
-				t.Errorf("Invalid color index in fractal layer at [%d][%d]: %d (should be 0-%d)",
-					i, j, colorIdx, len(colors)-1)
+	for y, row := range grid {
+		for x, colorIdx := range row {
+			if colorIdx < 0 || colorIdx >= numColors {
+				t.Errorf("Invalid color index after CA at [%d][%d]: %d", y, x, colorIdx)
 			}
 		}
-	}
-}
-
-func TestPat5Generator_GetDominantColor(t *testing.T) {
-	gen := &Pat5Generator{}
-
-	// Create a test grid with known dominant color
-	grid := [][]int{
-		{0, 0, 1, 1},
-		{0, 0, 1, 2},
-		{0, 2, 2, 2},
-		{3, 3, 2, 2},
-	}
-
-	// Test area where color 0 is dominant (top-left 2x2)
-	dominant := gen.getDominantColor(grid, 0, 0, 2, 2)
-	if dominant != 0 {
-		t.Errorf("Expected dominant color 0 in top-left, got %d", dominant)
-	}
-
-	// Test area where color 2 is dominant (bottom-right 3x3)
-	dominant = gen.getDominantColor(grid, 1, 1, 3, 3)
-	if dominant != 2 {
-		t.Errorf("Expected dominant color 2 in bottom-right, got %d", dominant)
 	}
 }
 
@@ -180,7 +143,7 @@ func TestPat5Generator_WithCustomColorRatios(t *testing.T) {
 		Height:        50,
 		BasePixelSize: 2,
 		PatternType:   "pat5",
-		ColorRatios:   []float64{0.6, 0.25, 0.10, 0.05}, // Custom MARPAT-style ratios
+		ColorRatios:   []float64{0.6, 0.25, 0.10, 0.05}, // Custom pat5-style ratios
 	}
 
 	colors := []color.RGBA{
@@ -248,9 +211,9 @@ func TestPat5Generator_EdgeCases(t *testing.T) {
 	}
 }
 
-func TestPat5Generator_DefaultMARPATRatios(t *testing.T) {
-	// When no explicit ratios are set (RatiosString == ""), pat5 must use MARPAT
-	// ratios internally, so colour 0 (the base) dominates.
+func TestPat5Generator_DefaultRatios(t *testing.T) {
+	// When no explicit ratios are set (RatiosString == ""), pat5 must use its
+	// default ratios internally, so colour 0 (the base) dominates.
 	ctx := context.Background()
 	cfg := &config.Config{
 		Width:         200,
@@ -300,13 +263,15 @@ func TestPat5Generator_DefaultMARPATRatios(t *testing.T) {
 		t.Skip("No exact colour matches found (blending may be active)")
 	}
 
-	baseRatio := float64(counts[0]) / float64(total)
-	accentRatio := float64(counts[3]) / float64(total)
+	targets := []float64{0.45, 0.30, 0.15, 0.10}
+	names := []string{"base green", "tan", "brown", "dark green"}
+	tolerance := 0.10 // ±10% absolute
 
-	// Base colour should be significantly more prominent than accent colour.
-	// With equal ratios both would be ~25%; with MARPAT ratios base ~45%, accent ~10%.
-	if baseRatio <= accentRatio*1.5 {
-		t.Errorf("Base colour ratio %f is not sufficiently dominant over accent %f — MARPAT ratios may not be applied",
-			baseRatio, accentRatio)
+	for i := 0; i < len(colors); i++ {
+		actual := float64(counts[i]) / float64(total)
+		if actual < targets[i]-tolerance || actual > targets[i]+tolerance {
+			t.Errorf("Colour %d (%s): actual %.3f outside target %.2f±%.2f",
+				i, names[i], actual, targets[i], tolerance)
+		}
 	}
 }

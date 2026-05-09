@@ -11,10 +11,10 @@ import (
 )
 
 // Pat2Generator creates pat2 (Scattered Camouflage) patterns.
-// Inspired by MARPAT digital camouflage with multi-scale fractal-like structures.
+// Uses multi-scale organic and digital structures.
 type Pat2Generator struct{}
 
-// Generate creates pat2 style camouflage inspired by real military patterns like MARPAT.
+// Generate creates pat2 style camouflage inspired by real military field patterns.
 // Uses multi-scale approach with organic blob shapes and digital pixel structure.
 func (pg *Pat2Generator) Generate(ctx context.Context, cfg *config.Config, colors []color.RGBA) (image.Image, error) {
 	// Use the centralized pixel size adjustment for perfect fit
@@ -35,7 +35,7 @@ func (pg *Pat2Generator) Generate(ctx context.Context, cfg *config.Config, color
 		}
 	}
 
-	// Multi-scale approach like MARPAT with weighted color distribution
+	// Multi-scale approach with weighted color distribution
 	// Large scale: Major blobs with directional bias (like MultiCam/OCP)
 	pg.generateLargeScaleBlobs(grid, gridWidth, gridHeight, colors, cfg)
 
@@ -48,7 +48,7 @@ func (pg *Pat2Generator) Generate(ctx context.Context, cfg *config.Config, color
 	// Add directional flow patterns (horizontal bias like OCP)
 	pg.addDirectionalFlow(grid, gridWidth, gridHeight, colors, cfg)
 
-	// Small scale: Digital noise and micro-patterns (like MARPAT pixels)
+	// Small scale: Digital noise and micro-patterns
 	pg.generateSmallScaleNoise(grid, gridWidth, gridHeight, colors, cfg)
 
 	// Add fractal-like self-similarity
@@ -196,7 +196,7 @@ func (pg *Pat2Generator) drawOrganicBlob(grid [][]int, centerX, centerY, size, c
 
 // drawFractalElement creates small self-similar patterns
 func (pg *Pat2Generator) drawFractalElement(grid [][]int, centerX, centerY, size, colorIndex, gridWidth, gridHeight int) {
-	// Create L-shaped or T-shaped elements like in MARPAT
+	// Create small L-shaped or T-shaped digital elements
 	patterns := [][]struct{ dx, dy int }{
 		{{0, 0}, {1, 0}, {0, 1}},                   // L-shape
 		{{0, 0}, {-1, 0}, {1, 0}, {0, 1}},          // T-shape
