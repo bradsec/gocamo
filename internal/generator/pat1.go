@@ -31,8 +31,8 @@ func (pg *Pat1Generator) Generate(ctx context.Context, cfg *config.Config, color
 		grid[i] = make([]int, cellWidth)
 	}
 
-	// Initialize with random background color (any color can be background)
-	backgroundColorIndex := rand.Intn(len(colors))
+	// Use the lightest color as background — typical in woodland military patterns
+	backgroundColorIndex := pg.findBackgroundColor(colors)
 	for y := 0; y < cellHeight; y++ {
 		for x := 0; x < cellWidth; x++ {
 			grid[y][x] = backgroundColorIndex
@@ -200,23 +200,6 @@ func (pg *Pat1Generator) applyMilitarySmoothing(grid [][]int, cellWidth, cellHei
 
 // Helper functions for distributed military color selection
 
-// selectDistributedColor ensures all colors get used prominently like real SPLAT
-func (pg *Pat1Generator) selectDistributedColor(colors []color.RGBA, excludeIndex int, seed int) int {
-	// Create list of available colors (excluding background if specified)
-	availableColors := make([]int, 0, len(colors))
-	for i := range colors {
-		if i != excludeIndex {
-			availableColors = append(availableColors, i)
-		}
-	}
-
-	if len(availableColors) == 0 {
-		return 0 // Fallback
-	}
-
-	// Distribute colors evenly using seed to ensure good distribution
-	return availableColors[seed%len(availableColors)]
-}
 
 // Drawing functions for woodland elements
 
