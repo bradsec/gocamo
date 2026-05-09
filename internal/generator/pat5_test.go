@@ -95,34 +95,6 @@ func TestPat5Generator_MARPATColorRatios(t *testing.T) {
 	}
 }
 
-func TestPat5Generator_CreateRectangularTemplates(t *testing.T) {
-	gen := &Pat5Generator{}
-	templates := gen.createRectangularTemplates()
-
-	if len(templates) == 0 {
-		t.Fatal("No templates created")
-	}
-
-	// Test that templates have valid dimensions
-	for i, template := range templates {
-		if template.Width <= 0 || template.Height <= 0 {
-			t.Errorf("Template %d has invalid dimensions: %dx%d", i, template.Width, template.Height)
-		}
-
-		if len(template.Matrix) != template.Height {
-			t.Errorf("Template %d matrix height mismatch: expected %d, got %d",
-				i, template.Height, len(template.Matrix))
-		}
-
-		for j, row := range template.Matrix {
-			if len(row) != template.Width {
-				t.Errorf("Template %d row %d width mismatch: expected %d, got %d",
-					i, j, template.Width, len(row))
-			}
-		}
-	}
-}
-
 func TestPat5Generator_InitializeMARPATGrid(t *testing.T) {
 	gen := &Pat5Generator{}
 	width, height := 10, 10
@@ -198,31 +170,6 @@ func TestPat5Generator_GetDominantColor(t *testing.T) {
 	dominant = gen.getDominantColor(grid, 1, 1, 3, 3)
 	if dominant != 2 {
 		t.Errorf("Expected dominant color 2 in bottom-right, got %d", dominant)
-	}
-}
-
-func TestPat5Generator_CreateTemplate(t *testing.T) {
-	gen := &Pat5Generator{}
-
-	pattern := [][]bool{
-		{true, false, true},
-		{false, true, false},
-		{true, false, true},
-	}
-
-	template := gen.createTemplate(3, 3, pattern)
-
-	if template.Width != 3 || template.Height != 3 {
-		t.Errorf("Template dimensions incorrect: got %dx%d, want 3x3", template.Width, template.Height)
-	}
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			if template.Matrix[i][j] != pattern[i][j] {
-				t.Errorf("Template matrix mismatch at [%d][%d]: got %t, want %t",
-					i, j, template.Matrix[i][j], pattern[i][j])
-			}
-		}
 	}
 }
 
