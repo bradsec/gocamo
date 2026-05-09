@@ -214,6 +214,20 @@ func parseColorRatios(ratiosString string, numColors int) ([]float64, error) {
 		return ratios, nil
 	}
 
+	if ratiosString == "milspec" {
+		milspecBase := []float64{0.45, 0.30, 0.15, 0.10}
+		ratios := make([]float64, numColors)
+		sum := 0.0
+		for i := 0; i < numColors; i++ {
+			ratios[i] = milspecBase[i%len(milspecBase)]
+			sum += ratios[i]
+		}
+		for i := range ratios {
+			ratios[i] /= sum
+		}
+		return ratios, nil
+	}
+
 	// Parse custom ratios (expect simple integers like "2,1,3")
 	parts := strings.Split(strings.ReplaceAll(ratiosString, " ", ""), ",")
 	if len(parts) == 0 {
@@ -298,7 +312,7 @@ func ParseFlags() *Config {
 	flag.StringVar(&cfg.PatternType, "t", "pat1", "Set the pattern type (pat1, pat2, pat3, pat4, pat5, all, or image)")
 	flag.StringVar(&cfg.ImageDir, "i", "input", "Input directory containing images for image-based camouflage")
 	flag.IntVar(&cfg.KValue, "k", 4, "Number of main colors for image-based camouflage")
-	flag.StringVar(&cfg.RatiosString, "r", "", "Color ratios: 'random' for random ratios, integers like '2,1,3' (cycles if fewer than colors) (default: equal)")
+	flag.StringVar(&cfg.RatiosString, "r", "", "Color ratios: 'random', 'milspec' (45/30/15/10%), or integers like '2,1,3' (default: equal)")
 
 	flag.Parse()
 

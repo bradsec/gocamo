@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"runtime"
 	"strings"
@@ -418,6 +419,43 @@ func TestValidateHexColor_EdgeCases(t *testing.T) {
 			}
 			if !tc.valid && err == nil {
 				t.Errorf("validateHexColor(%q) should be invalid, got nil error", tc.input)
+			}
+		})
+	}
+}
+
+func TestParseColorRatios_Milspec(t *testing.T) {
+	tests := []struct {
+		numColors int
+		want      []float64
+	}{
+		{4, []float64{0.45, 0.30, 0.15, 0.10}},
+		{3, []float64{0.45 / 0.90, 0.30 / 0.90, 0.15 / 0.90}}, // normalised 3-colour
+		{2, []float64{0.45 / 0.75, 0.30 / 0.75}},               // normalised 2-colour
+	}
+
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d-color", tt.numColors), func(t *testing.T) {
+			ratios, err := parseColorRatios("milspec", tt.numColors)
+			if err != nil {
+				t.Fatalf("parseColorRatios(milspec, %d) error: %v", tt.numColors, err)
+			}
+			if len(ratios) != tt.numColors {
+				t.Fatalf("got %d ratios, want %d", len(ratios), tt.numColors)
+			}
+
+			sum := 0.0
+			for _, r := range ratios {
+				sum += r
+			}
+			if math.Abs(sum-1.0) > 0.001 {
+				t.Errorf("ratios sum = %f, want 1.0", sum)
+			}
+
+			for i, want := range tt.want {
+				if math.Abs(ratios[i]-want) > 0.001 {
+					t.Errorf("ratio[%d] = %f, want %f", i, ratios[i], want)
+				}
 			}
 		})
 	}
