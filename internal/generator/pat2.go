@@ -130,7 +130,7 @@ func (pg *Pat2Generator) generateMediumScaleElements(grid [][]int, gridWidth, gr
 
 // generateSmallScaleNoise adds organic micro-patterns instead of rectangular pixels
 func (pg *Pat2Generator) generateSmallScaleNoise(grid [][]int, gridWidth, gridHeight int, colors []color.RGBA, cfg *config.Config) {
-	numPixels := (gridWidth * gridHeight) / 30 // Reduced density for more organic look
+	numPixels := (gridWidth * gridHeight) / 200
 
 	for i := 0; i < numPixels; i++ {
 		x := rand.Intn(gridWidth)
@@ -172,9 +172,9 @@ func (pg *Pat2Generator) drawOrganicBlob(grid [][]int, centerX, centerY, size, c
 				// Distance from center with organic variation
 				distance := math.Sqrt(float64(dx*dx + dy*dy))
 
-				// Multi-scale organic noise for more natural boundaries
-				noiseValue1 := pg.simpleNoise(float64(x)*0.08, float64(y)*0.08)
-				noiseValue2 := pg.simpleNoise(float64(x)*0.2, float64(y)*0.2) * 0.3
+				// Multi-scale organic noise for natural, complex boundaries
+				noiseValue1 := pg.simpleNoise(float64(x)*0.2, float64(y)*0.2)
+				noiseValue2 := pg.simpleNoise(float64(x)*0.4, float64(y)*0.4) * 0.3
 				combinedNoise := noiseValue1 + noiseValue2
 
 				organicRadius := float64(size) + combinedNoise*2.5
@@ -233,10 +233,10 @@ func (pg *Pat2Generator) drawEllipticalBlob(grid [][]int, centerX, centerY, size
 				normalizedY := float64(dy) / float64(sizeY)
 				distance := normalizedX*normalizedX + normalizedY*normalizedY
 
-				// Multi-scale organic noise for more natural, irregular boundaries
-				noiseValue1 := pg.simpleNoise(float64(x)*0.12, float64(y)*0.12)
-				noiseValue2 := pg.simpleNoise(float64(x)*0.25, float64(y)*0.25) * 0.4
-				noiseValue3 := pg.simpleNoise(float64(x)*0.5, float64(y)*0.5) * 0.15
+				// Multi-scale organic noise for natural, irregular boundaries
+				noiseValue1 := pg.simpleNoise(float64(x)*0.2, float64(y)*0.2)
+				noiseValue2 := pg.simpleNoise(float64(x)*0.4, float64(y)*0.4) * 0.4
+				noiseValue3 := pg.simpleNoise(float64(x)*0.7, float64(y)*0.7) * 0.15
 				combinedNoise := noiseValue1 + noiseValue2 + noiseValue3
 
 				organicRadius := 1.0 + combinedNoise*0.6

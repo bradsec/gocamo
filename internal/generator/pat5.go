@@ -296,22 +296,22 @@ func (pg *Pat5Generator) generateFractalLayer(width, height int, colors []color.
 // createRectangleClusters defines MARPAT-style rectangle variations with weighted probabilities
 func (pg *Pat5Generator) createRectangleClusters() []RectangleCluster {
 	return []RectangleCluster{
-		// Full blocks (40% - main pattern base)
-		{Width: 4, Height: 4, ClusterType: "full", Probability: 0.25},
-		{Width: 6, Height: 6, ClusterType: "full", Probability: 0.15},
+		// Full blocks — main pattern base
+		{Width: 10, Height: 10, ClusterType: "full", Probability: 0.25},
+		{Width: 14, Height: 14, ClusterType: "full", Probability: 0.15},
 
-		// Horizontal rectangles (30% - MARPAT characteristic)
-		{Width: 6, Height: 3, ClusterType: "horizontal", Probability: 0.12},
-		{Width: 8, Height: 2, ClusterType: "horizontal", Probability: 0.10},
-		{Width: 4, Height: 2, ClusterType: "horizontal", Probability: 0.08},
+		// Horizontal rectangles — MARPAT characteristic
+		{Width: 14, Height: 6, ClusterType: "horizontal", Probability: 0.12},
+		{Width: 18, Height: 4, ClusterType: "horizontal", Probability: 0.10},
+		{Width: 10, Height: 4, ClusterType: "horizontal", Probability: 0.08},
 
-		// Quarter blocks (20% - detail areas)
-		{Width: 2, Height: 2, ClusterType: "quarter", Probability: 0.12},
-		{Width: 3, Height: 3, ClusterType: "quarter", Probability: 0.08},
+		// Quarter blocks — detail areas
+		{Width: 5, Height: 5, ClusterType: "quarter", Probability: 0.12},
+		{Width: 7, Height: 7, ClusterType: "quarter", Probability: 0.08},
 
-		// Vertical rectangles (10% - variation)
-		{Width: 2, Height: 6, ClusterType: "vertical", Probability: 0.05},
-		{Width: 3, Height: 4, ClusterType: "vertical", Probability: 0.05},
+		// Vertical rectangles — variation
+		{Width: 4, Height: 14, ClusterType: "vertical", Probability: 0.05},
+		{Width: 6, Height: 10, ClusterType: "vertical", Probability: 0.05},
 	}
 }
 
