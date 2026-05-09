@@ -25,47 +25,61 @@ The program will produce optimized small PNG file sizes for high-resolution patt
 - 9.4MB for a 4K image with `-edge` details added
 - 10.5MB for a 4K image with `-noise` and `-edge` details added
 
-## Pattern Types (pat1, pat2, pat3, pat4, all, image)
+## Pattern Types (pat1, pat2, pat3, pat4, pat5, all, image)
 
 ### pat1 (set using `-t pat1`, default if no type specified)
 
+Woodland-style organic shapes. The lightest colour is automatically used as the background base.
+
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat1 -w 900 -h 900
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat1 -w 900 -h 900
 ```
 
-![Sample Images](samples/gocamo_000_custom_46482f_6d6851_9b967f_1e2415_pat1_w900x900.png)
+![Sample Images](samples/gocamo_000_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat1_w900x900.png)
 
 ### pat2 (set using `-t pat2`)
 
+Blob-based organic camouflage using spatially-coherent Perlin noise for smooth, natural-looking blob edges.
+
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat2 -w 900 -h 900
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat2 -w 900 -h 900
 ```
 
-![Sample Images](samples/gocamo_001_custom_46482f_6d6851_9b967f_1e2415_pat2_w900x900.png)
+![Sample Images](samples/gocamo_001_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat2_w900x900.png)
 
 ### pat3 (set using `-t pat3`)
 
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat3 -w 900 -h 900
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat3 -w 900 -h 900
 ```
 
-![Sample Images](samples/gocamo_002_custom_46482f_6d6851_9b967f_1e2415_pat3_w900x900.png)
+![Sample Images](samples/gocamo_002_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat3_w900x900.png)
 
 ### pat4 (set using `-t pat4`)
 
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat4 -w 900 -h 900
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat4 -w 900 -h 900
 ```
 
-![Sample Images](samples/gocamo_003_custom_46482f_6d6851_9b967f_1e2415_pat4_w900x900.png)
+![Sample Images](samples/gocamo_003_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat4_w900x900.png)
 
 ### pat5 (set using `-t pat5`)
 
+MARPAT-inspired digital camouflage using a 5-layer pipeline: IFS fractal macro structure → MARPAT-weighted colour grid → rectangle clustering → digital pixel blocks → fine texture noise. Uses authentic MARPAT colour ratios (45/30/15/10%) by default.
+
 ```terminal
-gocamo -c "#46482f,#6d6851,#9b967f,#1e2415" -t pat5 -w 900 -h 900
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -w 900 -h 900
 ```
 
-![Sample Images](samples/gocamo_004_custom_46482f_6d6851_9b967f_1e2415_pat5_w900x900.png)
+![Sample Images](samples/gocamo_004_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat5_w900x900.png)
+
+With `-r milspec` (explicit milspec ratios — identical to pat5 default, useful when combining with other patterns via `-t all`):
+
+```terminal
+gocamo -c "#5a6b3c,#d4c5a7,#4a3f2a,#2d362a" -t pat5 -r milspec -w 900 -h 900
+```
+
+![Sample Images](samples/gocamo_000_custom_5a6b3c_d4c5a7_4a3f2a_2d362a_pat5_milspec_w900x900.png)
 
 ### all (set using `-t all`)
 The all option generates patterns using all five pattern types (pat1, pat2, pat3, pat4, pat5) for each color palette provided. This is useful when you want to see all pattern variations for comparison or when generating a complete set of patterns from the same color scheme.
@@ -92,34 +106,33 @@ Reference (source) photo:
 gocamo -t image -w 900 -h 900
 ```
 
-Pattern result with default `-b 4 and k 4`:
+Pattern result with default `-b 4` and 4 colors `k 4`:
 
-![Sample Images](samples/image.png)
+![Sample Images](samples/image_k4.png)
 
 ```terminal
 gocamo -t image -w 900 -h 900 -b 10
 ```
 
-Pattern result with `-b 10`:
+Pattern result with `-b 10` and 4 colors:
 
-![Sample Images](samples/image_b10.png)
-
+![Sample Images](samples/image_b10_k4.png)
 
 ```terminal
 gocamo -t image -w 900 -h 900 -k 16
 ```
 
-Pattern result with default `-b 4` and 16 colors `k 16`:
+Pattern result with default `-b 4` and 16 colors `-k 16`:
 
-![Sample Images](samples/imagek16.png)
+![Sample Images](samples/image_k16.png)
 
 ```terminal
 gocamo -t image -w 900 -h 900 -b 10 -k 16
 ```
 
-Pattern result with `-b 10` and 16 colors `k 16`:
+Pattern result with `-b 10` and 16 colors `-k 16`:
 
-![Sample Images](samples/imageb10k16.png)
+![Sample Images](samples/image_b10_k16.png)
 
 
 
@@ -244,7 +257,7 @@ Usage of ./gocamo:
   -o string
     	The output directory for generated images (default "output")
   -r string
-    	Color ratios: 'random' for random ratios, integers like '2,1,3' (cycles if fewer than colors) (default: equal)
+    	Color ratios: 'random', 'milspec' (45/30/15/10%), or integers like '2,1,3' (default: equal)
   -t string
     	Set the pattern type (pat1, pat2, pat3, pat4, pat5, all, or image) (default "pat1")
   -w int
