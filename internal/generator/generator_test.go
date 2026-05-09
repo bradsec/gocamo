@@ -473,6 +473,28 @@ func TestGenerateFromImage_ValidImage(t *testing.T) {
 	}
 }
 
+func TestGenerateFromImage_ErrorBeforeSort(t *testing.T) {
+	// Verifies that error from Generate() is returned before sortColors runs.
+	// A nonexistent path causes an error; the function must return it immediately.
+	cfg := &config.Config{
+		Width:         100,
+		Height:        100,
+		BasePixelSize: 4,
+		KValue:        4,
+	}
+
+	tempDir := t.TempDir()
+	ctx := context.Background()
+
+	err := GenerateFromImage(ctx, cfg, "/definitely/does/not/exist.jpg", 0, tempDir)
+	if err == nil {
+		t.Fatal("expected error for nonexistent image, got nil")
+	}
+	if !strings.Contains(err.Error(), "error generating pattern from image") {
+		t.Errorf("unexpected error message: %v", err)
+	}
+}
+
 func TestGeneratePattern_ContextTimeout(t *testing.T) {
 	cfg := &config.Config{
 		Width:         1000, // Large size to potentially cause timeout

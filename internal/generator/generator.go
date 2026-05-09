@@ -107,6 +107,9 @@ func GenerateFromImage(ctx context.Context, cfg *config.Config, imagePath string
 	gen := &ImageGenerator{InputFile: imagePath}
 
 	img, mainColors, err := gen.Generate(ctx, cfg, nil)
+	if err != nil {
+		return fmt.Errorf("error generating pattern from image %s: %w", imagePath, err)
+	}
 
 	// Sort the main colors
 	sortColors(mainColors)
@@ -117,10 +120,6 @@ func GenerateFromImage(ctx context.Context, cfg *config.Config, imagePath string
 		hexColors[i] = fmt.Sprintf("%02x%02x%02x", c.R, c.G, c.B)
 	}
 	colorCodesStr := strings.Join(hexColors, "_")
-
-	if err != nil {
-		return fmt.Errorf("error generating pattern from image %s: %w", imagePath, err)
-	}
 
 	baseName := filepath.Base(imagePath)
 	fileName := fmt.Sprintf("gocamo_from_image_%s_%03d_%s_k%d_w%dx%d.png",
