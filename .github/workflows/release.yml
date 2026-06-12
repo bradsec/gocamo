@@ -1,0 +1,50 @@
+name: Go Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build binaries for multiple platforms
+        env:
+          CGO_ENABLED: 0
+        run: |
+          GOARCH=amd64 GOOS=linux go build -o gocamo-linux-amd64 ./cmd/gocamo
+          GOARCH=arm64 GOOS=linux go build -o gocamo-linux-arm64 ./cmd/gocamo
+          GOARCH=amd64 GOOS=windows go build -o gocamo-windows-amd64.exe ./cmd/gocamo
+          GOARCH=amd64 GOOS=darwin go build -o gocamo-darwin-amd64 ./cmd/gocamo
+          GOARCH=arm64 GOOS=darwin go build -o gocamo-darwin-arm64 ./cmd/gocamo
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          body: "Release ${{ github.ref_name }} of the gocamo project. Binaries attached."
+          files: |
+            gocamo-linux-amd64
+            gocamo-linux-arm64
+            gocamo-windows-amd64.exe
+            gocamo-darwin-amd64
+            gocamo-darwin-arm64
